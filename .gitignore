@@ -4,3 +4,9 @@
 *.vscode/
 *.gv
 **/build/*
+
+# CATKIN artifacts
+.catkin_workspace
+**/.catkin_tools/*
+**/devel/*
+**/logs/*
