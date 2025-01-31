@@ -56,12 +56,15 @@ RUN sudo apt-get update && sudo apt-get install -y \
     iputils-ping \
     unzip \
     ros-noetic-common-tutorials \
-    ros-noetic-rospy-tutorials \
     ros-noetic-geometry-tutorials \
-    ros-noetic-rosserial \
+    ros-noetic-mavros \
+    ros-noetic-mavros-extras \
     ros-noetic-rqt-graph \
     ros-noetic-roscpp \
-    ros-noetic-rospy
+    ros-noetic-rosserial \
+    ros-noetic-rospy \
+    ros-noetic-rospy-tutorials 
+
 
 # Switch back to the root user to install the Arduino CLI
 USER root
@@ -112,7 +115,8 @@ RUN pip3 install --no-cache-dir \
     rospkg \
     catkin-tools \
     networkx \
-    paho-mqtt
+    paho-mqtt \
+    pymavlink
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
