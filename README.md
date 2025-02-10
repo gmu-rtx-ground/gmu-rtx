@@ -2,7 +2,13 @@
 
 ## Dependencies
 
+### Jetson Xavier NX
+
 The GMU-RTX ground team will be leveraging ROS on a host [NVIDIA Jetson Xavier NX](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-xavier-series/)
+
+#### Jetson Xavier NX Pinout
+
+**Section 4.4 Pin List** in the [datasheet](docs/nvidia/Jetson-Xavier-NX-Series-Modules-DS-10184-001_v1.9.pdf) provides pinout documentation for the Xavier NX. Alternatively, Jetsonhacks.com provides a useful [Xavier NX Pinout](https://jetsonhacks.com/nvidia-jetson-xavier-nx-gpio-header-pinout/) online.
 
 ### Windows Subsystem Linux (WSL)
 
@@ -76,11 +82,3 @@ After authentication, users can pull the latest Docker image via:
 ```bash
 $ docker pull ghcr.io/gmu-rtx-ground/gmu-rtx
 ```
-
-### Jetson Xavier NX Linux
-
-Lorem ipsum
-
-## Jetson Xavier NX Pinout
-
-**Section 4.4 Pin List** in the [datasheet](docs/nvidia/Jetson-Xavier-NX-Series-Modules-DS-10184-001_v1.9.pdf) provides pinout documentation for the Xavier NX. Alternatively, Jetsonhacks.com provides a useful [Xavier NX Pinout](https://jetsonhacks.com/nvidia-jetson-xavier-nx-gpio-header-pinout/) online.
