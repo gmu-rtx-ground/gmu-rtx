@@ -38,33 +38,52 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 ## ADD ANY CUSTOM SETUP BELOW ##
 ################################
 
-ENV QT_X11_NO-MITSHM=1
-
-# Environment Variables for ROS
-ENV CPLUS_INCLUDE_PATH=/opt/ros/noetic/include
-ENV LD_LIBRARY_PATH=/opt/ros/noetic/lib
+ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
 
 # Install system dependencies and useful tools
 RUN sudo apt-get update && sudo apt-get install -y \
-    python3-pip \
-    python3-venv \
+    apt-transport-https \
+    bluez \
     build-essential \
     curl \
-    nano \
-    htop \
-    net-tools \
+    dbus \
     iputils-ping \
+    libopencv-dev \
+    nano \
+    net-tools \
+    openssh-client \
+    python3-opencv \
+    python3-pip \
     unzip \
     ros-noetic-common-tutorials \
+    ros-noetic-ddynamic-reconfigure \
     ros-noetic-geometry-tutorials \
+    ros-noetic-image-transport \
     ros-noetic-mavros \
     ros-noetic-mavros-extras \
     ros-noetic-rqt-graph \
     ros-noetic-roscpp \
     ros-noetic-rosserial \
     ros-noetic-rospy \
-    ros-noetic-rospy-tutorials 
+    ros-noetic-rospy-tutorials \
+    ros-noetic-witmotion-ros
 
+# Add /home/ubuntu/.local/bin to the PATH
+ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
+
+# Setup Intel RealSense SDK
+RUN sudo mkdir -p /etc/apt/keyrings
+RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee /etc/apt/keyrings/librealsense.pgp > /dev/null
+
+RUN echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo `lsb_release -cs` main" | \
+            sudo tee /etc/apt/sources.list.d/librealsense.list && \
+            sudo apt-get update
+            
+RUN sudo apt-get install -y \
+        librealsense2-dkms \
+        librealsense2-utils \
+        librealsense2-dev \
+        librealsense2-dbg
 
 # Switch back to the root user to install the Arduino CLI
 USER root
@@ -72,18 +91,11 @@ USER root
 # Create a directory for the Arduino CLI binary
 RUN mkdir -p /usr/local/bin
 
-# Check if the binary exists
-RUN ls -lah /usr/local/bin
-
 # Install Arduino CLI
 # RUN curl to download the latest version of the Arduino CLI binary and extract to the /usr/local/bin directory
 RUN curl -fsSL --retry 5 --fail https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz -o /home/${USERNAME}/arduino-cli.tar.gz  && \
-        ls -lah /home/${USERNAME}/arduino-cli.tar.gz && \
         tar -xzf /home/${USERNAME}/arduino-cli.tar.gz -C /usr/local/bin && \
         rm -rf /home/${USERNAME}/arduino-cli.tar.gz
-
-# Check if the binary exists
-RUN ls -lah /usr/local/bin/arduino-cli
 
 # Make the Arduino CLI binary executable
 RUN chmod +x /usr/local/bin/arduino-cli
@@ -97,9 +109,6 @@ RUN arduino-cli config init
 # Install common Arduino cores (for example, AVR for Arduino Uno)
 RUN arduino-cli core update-index && \
     arduino-cli core install arduino:avr
-
-# Install example Arduino libraries
-RUN arduino-cli lib install "Adafruit GFX Library" "Adafruit BusIO"
 
 # Upgrade pip
 RUN pip3 install --upgrade pip
@@ -117,6 +126,34 @@ RUN pip3 install --no-cache-dir \
     networkx \
     paho-mqtt \
     pymavlink
+
+# Initialize the ROS workspace
+RUN mkdir -p /home/${USERNAME}/catkin_ws/src
+
+# Setup SSH keys
+USER root
+RUN mkdir -p -m 0700 /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# Clone the required ROS packages
+RUN --mount=type=ssh \
+    git clone --recursive git@github.com:gmu-rtx-ground/witmotion_IMU_ros.git ${CATKIN_WS}/src/witmotion_ros && \
+    git clone --single-branch --branch ros1-legacy git@github.com:gmu-rtx-ground/realsense-ros.git ${CATKIN_WS}/src/realsense-ros && \
+    git clone --single-branch --branch noetic git@github.com:gmu-rtx-ground/vision_opencv.git ${CATKIN_WS}/src/vision_opencv && \
+    git clone git@github.com:gmu-rtx-ground/ublox-F9P.git ${CATKIN_WS}/src/ublox-F9P
+
+# Grant permissions to the user
+RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS}
+
+# Switch back to the non-root user
+USER ${USERNAME}
+
+# Build the ROS workspace
+WORKDIR /home/${USERNAME}/catkin_ws
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
+
+# Source the ROS workspace
+RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
