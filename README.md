@@ -6,6 +6,12 @@
 
 The GMU-RTX ground team will be leveraging ROS on a host [NVIDIA Jetson Xavier NX](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-xavier-series/)
 
+### Enable Bluetooth TTY
+
+The NVIDIA Linux Kernel provided by [SKD Manager](https://developer.nvidia.com/sdk-manager) does not enable Bluetooth TTY by default. To leverage the Wit-Motion BWT-61 IMU, this feature will need to be enabled. Steps to recompile the kernel:
+
+Coming Soon
+
 #### Jetson Xavier NX Pinout
 
 **Section 4.4 Pin List** in the [datasheet](docs/nvidia/Jetson-Xavier-NX-Series-Modules-DS-10184-001_v1.9.pdf) provides pinout documentation for the Xavier NX. Alternatively, Jetsonhacks.com provides a useful [Xavier NX Pinout](https://jetsonhacks.com/nvidia-jetson-xavier-nx-gpio-header-pinout/) online.
