@@ -2,9 +2,7 @@
 
 ## ROS
 
-```sh
-$ roslaunch losi.launch
-```
+Coming soon
 
 ## Dependencies
 
