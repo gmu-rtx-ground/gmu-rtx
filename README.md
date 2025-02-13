@@ -1,20 +1,38 @@
 # gmu-rtx
 
+## ROS
+
+```sh
+$ roslaunch losi.launch
+```
+
 ## Dependencies
 
 ### Jetson Xavier NX
 
 The GMU-RTX ground team will be leveraging ROS on a host [NVIDIA Jetson Xavier NX](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-xavier-series/)
 
-### Enable Bluetooth TTY
-
-The NVIDIA Linux Kernel provided by [SKD Manager](https://developer.nvidia.com/sdk-manager) does not enable Bluetooth TTY by default. To leverage the Wit-Motion BWT-61 IMU, this feature will need to be enabled. Steps to recompile the kernel:
-
-Coming Soon
-
 #### Jetson Xavier NX Pinout
 
 **Section 4.4 Pin List** in the [datasheet](docs/nvidia/Jetson-Xavier-NX-Series-Modules-DS-10184-001_v1.9.pdf) provides pinout documentation for the Xavier NX. Alternatively, Jetsonhacks.com provides a useful [Xavier NX Pinout](https://jetsonhacks.com/nvidia-jetson-xavier-nx-gpio-header-pinout/) online.
+
+#### udev rules
+
+Custom `udev` rules are in use to bind the sensor modules to specified names and configurations. These rules are found in the [ROS/udev_rules](/ROS/udev_rules) directory.
+
+| Module | Rules |
+| --- | --- |
+| Arduino | ![99-arduino.rules](/ROS/udev_rules/99-arduino.rules) |
+| ublox GPS | ![99-gps.rules](/ROS/udev_rules/99-gps.rules) |
+| wit-motion IMU | ![99-imu.rules](/ROS/udev_rules/99-imu.rules) |
+| xBee 538 | ![99-xbee.rules](/ROS/udev_rules/99-xbee.rules) |
+
+Ensure the `udev` rules are in added to the `/etc/udev/rules.d` directory and reboot the Jetson for the changes to take effet.
+
+```sh
+$ sudo mv /path/to/rules /etc/udev/rules.d
+$ sudo reboot
+```
 
 ### Windows Subsystem Linux (WSL)
 
