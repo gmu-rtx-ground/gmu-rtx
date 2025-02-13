@@ -140,7 +140,8 @@ RUN --mount=type=ssh \
     git clone --recursive git@github.com:gmu-rtx-ground/witmotion_IMU_ros.git ${CATKIN_WS}/src/witmotion_ros && \
     git clone --single-branch --branch ros1-legacy git@github.com:gmu-rtx-ground/realsense-ros.git ${CATKIN_WS}/src/realsense-ros && \
     git clone --single-branch --branch noetic git@github.com:gmu-rtx-ground/vision_opencv.git ${CATKIN_WS}/src/vision_opencv && \
-    git clone git@github.com:gmu-rtx-ground/ublox-F9P.git ${CATKIN_WS}/src/ublox-F9P
+    git clone git@github.com:gmu-rtx-ground/ublox-F9P.git ${CATKIN_WS}/src/ublox-F9P && \
+    git clone git@github.com:gmu-rtx-ground/losi_launch.git ${CATKIN_WS}/src/losi_launch
 
 # Grant permissions to the user
 RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS}
