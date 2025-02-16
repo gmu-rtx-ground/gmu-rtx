@@ -134,23 +134,37 @@ RUN mkdir -p /home/${USERNAME}/catkin_ws/src
 USER root
 RUN mkdir -p -m 0700 /root/.ssh && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
+    
 
-# Clone the required ROS packages
+# Clone the gmu-rtx repo 
 RUN --mount=type=ssh \
-    git clone --recursive git@github.com:gmu-rtx-ground/witmotion_IMU_ros.git ${CATKIN_WS}/src/witmotion_ros && \
-    git clone --single-branch --branch ros1-legacy git@github.com:gmu-rtx-ground/realsense-ros.git ${CATKIN_WS}/src/realsense-ros && \
-    git clone --single-branch --branch noetic git@github.com:gmu-rtx-ground/vision_opencv.git ${CATKIN_WS}/src/vision_opencv && \
-    git clone git@github.com:gmu-rtx-ground/ublox-F9P.git ${CATKIN_WS}/src/ublox-F9P && \
-    git clone git@github.com:gmu-rtx-ground/losi_launch.git ${CATKIN_WS}/src/losi_launch
+    git clone git@github.com:gmu-rtx-ground/gmu-rtx.git /home/${USERNAME}/gmu-rtx
+
+# Add udev rules for modules from gmu-rtx repo
+RUN sudo cp /home/${USERNAME}/gmu-rtx/ROS/udev_rules/* /etc/udev/rules.d/
+
+# Create Symbolic link for the ROS workspace
+RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/losi_launch /home/${USERNAME}/catkin_ws/src/losi_launch
+RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/realsense-ros /home/${USERNAME}/catkin_ws/src/realsense-ros
+RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/rosserial /home/${USERNAME}/catkin_ws/src/rosserial
+RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/ublox-F9P /home/${USERNAME}/catkin_ws/src/ublox-F9P
+RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/vision_opencv /home/${USERNAME}/catkin_ws/src/vision_opencv
+RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/witmotion_IMU_ros /home/${USERNAME}/catkin_ws/src/witmotion_IMU_ros
 
 # Grant permissions to the user
 RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS}
+RUN chown -R ${USER_UID}:${USER_GID} /home/${USERNAME}/gmu-rtx
 
 # Switch back to the non-root user
 USER ${USERNAME}
 
 # Build the ROS workspace
 WORKDIR /home/${USERNAME}/catkin_ws
+
+# Initialize the workspace
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin init"
+
+# Build the workspace
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
 # Source the ROS workspace
