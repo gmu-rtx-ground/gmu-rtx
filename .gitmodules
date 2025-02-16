@@ -15,3 +15,6 @@
 [submodule "ROS/losi_launch"]
 	path = ROS/losi_launch
 	url = git@github.com:gmu-rtx-ground/losi_launch.git
+[submodule "ROS/rosserial"]
+	path = ROS/rosserial
+	url = https://github.com/ros-drivers/rosserial.git
