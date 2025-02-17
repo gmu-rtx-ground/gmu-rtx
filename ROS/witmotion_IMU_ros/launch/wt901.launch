@@ -1,0 +1,15 @@
+<launch>
+    <rosparam command="load" file="$(find witmotion_ros)/config/wt901.yml" />
+    <node name="witmotion_imu" pkg="witmotion_ros"  type="witmotion_ros_node" output="screen"/>
+    
+    <!-- compute IMU quaternion -->
+    <!-- <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_node">
+        <param name="use_mag" value="true" />
+        <param name="publish_tf" value="false" />
+        <param name="world_frame" value="enu" />
+        <remap from="/imu/data_raw" to="/imu" />
+        <remap from="/imu/mag" to="/magnetometer" />
+        <remap from="/imu/data" to="/imu_filtered" />
+    </node>
+     -->
+</launch>
