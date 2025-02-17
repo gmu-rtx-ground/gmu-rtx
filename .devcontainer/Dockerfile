@@ -63,6 +63,8 @@ RUN sudo apt-get update && sudo apt-get install -y \
     ros-noetic-mavros-extras \
     ros-noetic-roscpp \
     ros-noetic-rosserial \
+    ros-noetic-rosserial-arduino \
+    ros-noetic-rosserial-python \
     ros-noetic-rospy \
     ros-noetic-rospy-tutorials \
     ros-noetic-rqt-graph \
@@ -79,7 +81,7 @@ RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee 
 RUN echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo `lsb_release -cs` main" | \
             sudo tee /etc/apt/sources.list.d/librealsense.list && \
             sudo apt-get update
-            
+
 RUN sudo apt-get install -y \
         librealsense2-dkms \
         librealsense2-utils \
@@ -104,12 +106,18 @@ RUN chmod +x /usr/local/bin/arduino-cli
 # Switch back to the non-root user
 USER $USERNAME
 
-# Configure Arduino CLI (creates required directories)
-RUN arduino-cli config init
+# Install the required Arduino libraries
+RUN arduino-cli config init && \
+    arduino-cli core update-index && \
+    arduino-cli core install arduino:avr && \
+    arduino-cli lib install AS5600 && \
+    arduino-cli lib install Encoder && \
+    arduino-cli lib install Servo
 
-# Install common Arduino cores (for example, AVR for Arduino Uno)
-RUN arduino-cli core update-index && \
-    arduino-cli core install arduino:avr
+# Install ros_lib in Arduino sketchbook directory
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
+                  cd /home/${USERNAME}/Arduino/libraries && \
+                  rosrun rosserial_arduino make_libraries.py ."
 
 # Upgrade pip
 RUN pip3 install --upgrade pip
