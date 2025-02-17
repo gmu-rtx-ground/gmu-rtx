@@ -1,0 +1,5 @@
+<launch>
+	<include file="$(find ublox_gps)/launch/rover.launch" />
+	<include file="$(find witmotion_ros)/launch/wt901.launch" />
+	<include file="$(find realsense2_camera)/launch/rs_camera.launch" />
+</launch>

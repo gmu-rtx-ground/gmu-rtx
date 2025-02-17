@@ -42,6 +42,8 @@ ros::Subscriber subRTCM;
 
 using namespace ublox_node;
 
+constexpr int ublox_node::UbloxNode::kResetWait;
+
 //
 // ublox_node namespace
 //
@@ -115,7 +117,7 @@ void UbloxNode::addProductInterface(std::string product_category,
   // if (product_category.compare("HPG") == 0 && ref_rov.compare("REF") == 0)
   //   components_.push_back(ComponentPtr(new HpgRefProduct));
   // else if (product_category.compare("HPG") == 0 && ref_rov.compare("ROV") == 0)
-    components_.push_back(ComponentPtr(new HpgRovProduct));
+    // components_.push_back(ComponentPtr(new HpgRovProduct));
   // else if (product_category.compare("TIM") == 0)
   //   components_.push_back(ComponentPtr(new TimProduct));
   // else if (product_category.compare("ADR") == 0 ||
@@ -165,7 +167,7 @@ void UbloxNode::getRosParams() {
 //    getRosUint("usb/tx_ready", usb_tx_, 0);
 //  }
   // Measurement rate params
-  nh->param("rate", rate_, 4.0);  // in Hz
+  nh->param("rate", rate_, 10.0);  // in Hz
   getRosUint("nav_rate", nav_rate, 1);  // # of measurement rate cycles
   // RTCM params
   getRosUint("rtcm/ids", rtcm_ids);  // RTCM output message IDs
@@ -429,7 +431,7 @@ bool UbloxNode::configureUblox() {
       if (load_.loadMask & load_.MASK_IO_PORT) {
         ROS_DEBUG("Loaded I/O configuration from memory, resetting serial %s",
           "communications.");
-        boost::posix_time::seconds wait(kResetWait);
+        boost::posix_time::seconds wait(10);
         gps.reset(wait);
         if (!gps.isConfigured())
           throw std::runtime_error(std::string("Failed to reset serial I/O") +
@@ -797,9 +799,9 @@ void UbloxFirmware6::fixDiagnostic(
 
 void UbloxFirmware6::callbackNavPosLlh(const ublox_msgs::NavPOSLLH& m) {
   if(enabled["nav_posllh"]) {
-    static ros::Publisher publisher =
+    static ros::Publisher publisherPos =
         nh->advertise<ublox_msgs::NavPOSLLH>("navposllh", kROSQueueSize);
-    publisher.publish(m);
+    publisherPos.publish(m);
   }
 
   // Position message
@@ -840,9 +842,9 @@ void UbloxFirmware6::callbackNavPosLlh(const ublox_msgs::NavPOSLLH& m) {
 
 void UbloxFirmware6::callbackNavVelNed(const ublox_msgs::NavVELNED& m) {
   if(enabled["nav_velned"]) {
-    static ros::Publisher publisher =
+    static ros::Publisher publisherVelNED =
         nh->advertise<ublox_msgs::NavVELNED>("navvelned", kROSQueueSize);
-    publisher.publish(m);
+    publisherVelNED.publish(m);
   }
 
   // Example geometry message
@@ -874,9 +876,9 @@ void UbloxFirmware6::callbackNavVelNed(const ublox_msgs::NavVELNED& m) {
 
 void UbloxFirmware6::callbackNavSol(const ublox_msgs::NavSOL& m) {
   if(enabled["nav_sol"]) {
-    static ros::Publisher publisher =
+    static ros::Publisher publisherNavSol =
         nh->advertise<ublox_msgs::NavSOL>("navsol", kROSQueueSize);
-    publisher.publish(m);
+    publisherNavSol.publish(m);
   }
   last_nav_sol_ = m;
 }
@@ -1277,28 +1279,41 @@ bool UbloxFirmware8::configureUblox() {
 
 void UbloxFirmware8::subscribe() {
   // Whether to publish Nav PVT messages
+  int rpn_rate = 1;
+  nh->param("publish/nav/rate", rpn_rate, 1);
+
   nh->param("publish/nav/pvt", enabled["nav_pvt"], enabled["nav"]);
   // Subscribe to Nav PVT
   gps.subscribe<ublox_msgs::NavPVT>(
-    boost::bind(&UbloxFirmware7Plus::callbackNavPvt, this, _1), kSubscribeRate);
+    boost::bind(&UbloxFirmware7Plus::callbackNavPvt, this, _1), static_cast<unsigned int>(rpn_rate));
 
   // Subscribe to Nav SAT messages
   nh->param("publish/nav/sat", enabled["nav_sat"], enabled["nav"]);
   if (enabled["nav_sat"])
     gps.subscribe<ublox_msgs::NavSAT>(boost::bind(
-        publish<ublox_msgs::NavSAT>, _1, "navsat"), kNavSvInfoSubscribeRate);
+        publish<ublox_msgs::NavSAT>, _1, "navsat"), static_cast<unsigned int>(rpn_rate));
+
+  // nh->param("publish/nav/status", enabled["nav_status"], enabled["nav"]);
+  // if (enabled["nav_status"])
+  //   gps.subscribe<ublox_msgs::NavSTATUS>(boost::bind(
+  //       publish<ublox_msgs::NavSTATUS>, _1, "navstatus"), static_cast<unsigned int>(rpn_rate));
+
+  nh->param("publish/nav/posecef", enabled["nav_posecef"], enabled["nav"]);
+  if (enabled["nav_posecef"])
+    gps.subscribe<ublox_msgs::NavPOSECEF>(boost::bind(
+        publish<ublox_msgs::NavPOSECEF>, _1, "navposecef"), static_cast<unsigned int>(rpn_rate));
 
   // Subscribe to Mon HW
   nh->param("publish/mon/hw", enabled["mon_hw"], enabled["mon"]);
   if (enabled["mon_hw"])
     gps.subscribe<ublox_msgs::MonHW>(boost::bind(
-        publish<ublox_msgs::MonHW>, _1, "monhw"), kSubscribeRate);
+        publish<ublox_msgs::MonHW>, _1, "monhw"), static_cast<unsigned int>(rpn_rate));
 
   // Subscribe to RTCM messages
   nh->param("publish/rxm/rtcm", enabled["rxm_rtcm"], enabled["rxm"]);
   if (enabled["rxm_rtcm"])
     gps.subscribe<ublox_msgs::RxmRTCM>(boost::bind(
-        publish<ublox_msgs::RxmRTCM>, _1, "rxmrtcm"), kSubscribeRate);
+        publish<ublox_msgs::RxmRTCM>, _1, "rxmrtcm"), static_cast<unsigned int>(rpn_rate));
 }
 
 //
@@ -1621,9 +1636,9 @@ void HpgRefProduct::subscribe() {
 
 void HpgRefProduct::callbackNavSvIn(ublox_msgs::NavSVIN m) {
   if(enabled["nav_svin"]) {
-    static ros::Publisher publisher =
+    static ros::Publisher publisherSvin =
         nh->advertise<ublox_msgs::NavSVIN>("navsvin", kROSQueueSize);
-    publisher.publish(m);
+    publisherSvin.publish(m);
   }
 
   last_nav_svin_ = m;
@@ -1758,8 +1773,8 @@ void HpgRovProduct::callbackNavPVT(const ublox_msgs::NavPVT &m)
 {
     if (enabled["nav_pvt"])
     {
-        static ros::Publisher publisher = nh->advertise<ublox_msgs::NavPVT>("navpvt", kROSQueueSize);
-        publisher.publish(m);
+        static ros::Publisher publisherPvt = nh->advertise<ublox_msgs::NavPVT>("navpvt", kROSQueueSize);
+        publisherPvt.publish(m);
     }
 }
 
@@ -1767,8 +1782,8 @@ void HpgRovProduct::callbackNavVelNed(const ublox_msgs::NavVELNED &m)
 {
     if (enabled["nav_velned"])
     {
-        static ros::Publisher publisher = nh->advertise<ublox_msgs::NavVELNED>("navvelned", kROSQueueSize);
-        publisher.publish(m);
+        static ros::Publisher publisherNavVelNed = nh->advertise<ublox_msgs::NavVELNED>("navvelned", kROSQueueSize);
+        publisherNavVelNed.publish(m);
     }
 }
 
@@ -1776,8 +1791,8 @@ void HpgRovProduct::callbackNavSat(const ublox_msgs::NavSAT &m)
 {
     if (enabled["nav_sat"])
     {
-        static ros::Publisher publisher = nh->advertise<ublox_msgs::NavSAT>("navsat", kROSQueueSize);
-        publisher.publish(m);
+        static ros::Publisher publisherNavSat = nh->advertise<ublox_msgs::NavSAT>("navsat", kROSQueueSize);
+        publisherNavSat.publish(m);
     }
 }
 
@@ -1785,16 +1800,16 @@ void HpgRovProduct::callbackRxmRawx(const ublox_msgs::RxmRAWX &m)
 {
     if (enabled["rxm_rawx"])
     {
-        static ros::Publisher publisher = nh->advertise<ublox_msgs::RxmRAWX>("rxmrawx", kROSQueueSize);
-        publisher.publish(m);
+        static ros::Publisher publisherRxmRaw = nh->advertise<ublox_msgs::RxmRAWX>("rxmrawx", kROSQueueSize);
+        publisherRxmRaw.publish(m);
     }
 }
 
 void HpgRovProduct::callbackNavRelPosNed(const ublox_msgs::NavRELPOSNED &m) {
   if (enabled["nav_relposned"]) {
-    static ros::Publisher publisher =
+    static ros::Publisher publisherNavRelPos =
         nh->advertise<ublox_msgs::NavRELPOSNED>("navrelposned", kROSQueueSize);
-    publisher.publish(m);
+    publisherNavRelPos.publish(m);
   }
   last_rel_pos_ = m;
   updater->update();
@@ -1879,7 +1894,7 @@ void TimProduct::subscribe() {
 void TimProduct::callbackTimTM2(const ublox_msgs::TimTM2 &m) {
   
   if (enabled["tim_tm2"]) {
-    static ros::Publisher publisher =
+    static ros::Publisher publisherTimTm2 =
     	nh->advertise<ublox_msgs::TimTM2>("timtm2", kROSQueueSize);
     static ros::Publisher time_ref_pub =
 	nh->advertise<sensor_msgs::TimeReference>("interrupt_time", kROSQueueSize);
@@ -1898,7 +1913,7 @@ void TimProduct::callbackTimTM2(const ublox_msgs::TimTM2 &m) {
     t_ref_.header.stamp = ros::Time::now(); // create a new timestamp
     t_ref_.header.frame_id = frame_id;
   
-    publisher.publish(m);
+    publisherTimTm2.publish(m);
     time_ref_pub.publish(t_ref_);
   }
   

@@ -29,6 +29,7 @@
 
 #include <ublox_gps/gps.h>
 #include <boost/version.hpp>
+#include <iostream>
 
 namespace ublox_gps {
 
@@ -37,6 +38,8 @@ using namespace ublox_msgs;
 const boost::posix_time::time_duration Gps::default_timeout_ =
     boost::posix_time::milliseconds(
         static_cast<int>(Gps::kDefaultAckTimeout * 1000));
+
+constexpr int ublox_gps::Gps::kSetBaudrateSleepMs;
 
 Gps::Gps() : configured_(false), config_on_startup_flag_(true) {
  subscribeAcks();
@@ -105,6 +108,8 @@ void Gps::processUpdSosAck(const ublox_msgs::UpdSOS_Ack &m) {
 void Gps::initializeSerial(std::string port, unsigned int baudrate,
                            uint16_t uart_in, uint16_t uart_out) {
   port_ = port;
+  std::cout<< "Printing the arguments to this GPS initialize serrial fn" << std::endl;
+  std::cout<<"port"<< port << " baudrate" << baudrate << " uart_in" << uart_in << " uart_out" << uart_out << std::endl;
   boost::shared_ptr<boost::asio::io_service> io_service(
       new boost::asio::io_service);
   boost::shared_ptr<boost::asio::serial_port> serial(
@@ -117,7 +122,6 @@ void Gps::initializeSerial(std::string port, unsigned int baudrate,
     throw std::runtime_error("U-Blox: Could not open serial port :"
                              + port + " " + e.what());
   }
-
   ROS_INFO("U-Blox: Opened serial port %s", port.c_str());
     
   if(BOOST_VERSION < 106600)
@@ -142,6 +146,8 @@ void Gps::initializeSerial(std::string port, unsigned int baudrate,
   // Set the baudrate
   boost::asio::serial_port_base::baud_rate current_baudrate;
   serial->get_option(current_baudrate);
+  ROS_DEBUG("Current baudrate value: %u", current_baudrate.value());
+  // ROS_DEBUG("bhako baudrate chai: %u", baudrate);
   // Incrementally increase the baudrate to the desired value
   for (int i = 0; i < sizeof(kBaudrates)/sizeof(kBaudrates[0]); i++) {
     if (current_baudrate.value() == baudrate)
@@ -151,16 +157,23 @@ void Gps::initializeSerial(std::string port, unsigned int baudrate,
       continue;
     serial->set_option(
         boost::asio::serial_port_base::baud_rate(kBaudrates[i]));
+    // serial->set_option(
+    //     boost::asio::serial_port_base::baud_rate(32672));
     boost::this_thread::sleep(
-        boost::posix_time::milliseconds(kSetBaudrateSleepMs));
+        boost::posix_time::milliseconds(500));
     serial->get_option(current_baudrate);
     ROS_DEBUG("U-Blox: Set ASIO baudrate to %u", current_baudrate.value());
   }
   if (config_on_startup_flag_) {
-//    configured_ = configUart1(baudrate, uart_in, uart_out);
+    //    configured_ = configUart1(baudrate, uart_in, uart_out);
+    
     configured_ = configUsb(0, uart_in, uart_out);
+    // std::cout<<confi
+    std::cout<<"Value of configured: " << configured_ << std::endl;
+    std::cout<<"Value of current_baudrate.value" << current_baudrate.value() << std::endl;
+    std::cout<<"Value of baudrate" << baudrate <<std::endl;
     if(!configured_ || current_baudrate.value() != baudrate) {
-      throw std::runtime_error("Could not configure serial baud rate");
+      throw std::runtime_error("Could not configure serial baud- rate");
     }
   } else {
     configured_ = true;

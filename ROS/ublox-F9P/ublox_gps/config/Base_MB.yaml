@@ -5,3 +5,11 @@ publish:
     sat: true
   rxm:
     rawx: true
+
+device: /dev/ttyACM0
+# frame_id: gps
+
+uart1:
+  baudrate: 115200
+
+config_on_startup: false
