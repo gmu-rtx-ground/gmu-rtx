@@ -61,11 +61,12 @@ RUN sudo apt-get update && sudo apt-get install -y \
     ros-noetic-image-transport \
     ros-noetic-mavros \
     ros-noetic-mavros-extras \
-    ros-noetic-rqt-graph \
     ros-noetic-roscpp \
     ros-noetic-rosserial \
     ros-noetic-rospy \
     ros-noetic-rospy-tutorials \
+    ros-noetic-rqt-graph \
+    ros-noetic-rtcm-msgs \
     ros-noetic-witmotion-ros
 
 # Add /home/ubuntu/.local/bin to the PATH
@@ -134,7 +135,6 @@ RUN mkdir -p /home/${USERNAME}/catkin_ws/src
 USER root
 RUN mkdir -p -m 0700 /root/.ssh && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
-    
 
 # Clone the gmu-rtx repo 
 RUN --mount=type=ssh \
@@ -146,7 +146,6 @@ RUN sudo cp /home/${USERNAME}/gmu-rtx/ROS/udev_rules/* /etc/udev/rules.d/
 # Create Symbolic link for the ROS workspace
 RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/losi_launch /home/${USERNAME}/catkin_ws/src/losi_launch
 RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/realsense-ros /home/${USERNAME}/catkin_ws/src/realsense-ros
-RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/rosserial /home/${USERNAME}/catkin_ws/src/rosserial
 RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/ublox-F9P /home/${USERNAME}/catkin_ws/src/ublox-F9P
 RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/vision_opencv /home/${USERNAME}/catkin_ws/src/vision_opencv
 RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/witmotion_IMU_ros /home/${USERNAME}/catkin_ws/src/witmotion_IMU_ros
@@ -165,7 +164,7 @@ WORKDIR /home/${USERNAME}/catkin_ws
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin init"
 
 # Build the workspace
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 
 # Source the ROS workspace
 RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
