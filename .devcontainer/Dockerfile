@@ -1,5 +1,5 @@
 # Use the official ROS Noetic base image
-FROM ros:noetic
+FROM ros:noetic AS ros-noetic-base
 
 # Add ubuntu user with same UID and GID as your host system, if it doesn't already exist
 # Since Ubuntu 24.04, a non-root user is created by default with the name vscode and UID=1000
@@ -38,6 +38,8 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 ## ADD ANY CUSTOM SETUP BELOW ##
 ################################
 
+FROM ros-noetic-base AS dependencies-core
+
 ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
 
 # Install system dependencies and useful tools
@@ -74,6 +76,8 @@ RUN sudo apt-get update && sudo apt-get install -y \
 # Add /home/ubuntu/.local/bin to the PATH
 ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
 
+FROM dependencies-core AS dependencies-realsense2
+
 # Setup Intel RealSense SDK
 RUN sudo mkdir -p /etc/apt/keyrings
 RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee /etc/apt/keyrings/librealsense.pgp > /dev/null
@@ -87,6 +91,8 @@ RUN sudo apt-get install -y \
         librealsense2-utils \
         librealsense2-dev \
         librealsense2-dbg
+
+FROM dependencies-realsense2 AS dependencies-arduino
 
 # Switch back to the root user to install the Arduino CLI
 USER root
@@ -119,6 +125,9 @@ RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
                   cd /home/${USERNAME}/Arduino/libraries && \
                   rosrun rosserial_arduino make_libraries.py ."
 
+
+FROM dependencies-arduino AS dependencies-python
+
 # Upgrade pip
 RUN pip3 install --upgrade pip
 
@@ -135,6 +144,9 @@ RUN pip3 install --no-cache-dir \
     networkx \
     paho-mqtt \
     pymavlink
+
+
+FROM dependencies-python AS ros-initialize-catkin
 
 # Initialize the ROS workspace
 RUN mkdir -p /home/${USERNAME}/catkin_ws/src
