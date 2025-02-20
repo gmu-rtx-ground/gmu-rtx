@@ -78,19 +78,19 @@ ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
 
 FROM dependencies-core AS dependencies-realsense2
 
-# Setup Intel RealSense SDK
+# Setup Intel RealSense SDK for amd64
 RUN sudo mkdir -p /etc/apt/keyrings
 RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee /etc/apt/keyrings/librealsense.pgp > /dev/null
 
 RUN echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo `lsb_release -cs` main" | \
             sudo tee /etc/apt/sources.list.d/librealsense.list && \
             sudo apt-get update
-
+            
 RUN sudo apt-get install -y \
-        librealsense2-dkms \
-        librealsense2-utils \
-        librealsense2-dev \
-        librealsense2-dbg
+            librealsense2-dkms \
+            librealsense2-utils \
+            librealsense2-dev \
+            librealsense2-dbg
 
 FROM dependencies-realsense2 AS dependencies-arduino
 
@@ -100,11 +100,11 @@ USER root
 # Create a directory for the Arduino CLI binary
 RUN mkdir -p /usr/local/bin
 
-# Install Arduino CLI
-# RUN curl to download the latest version of the Arduino CLI binary and extract to the /usr/local/bin directory
-RUN curl -fsSL --retry 5 --fail https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz -o /home/${USERNAME}/arduino-cli.tar.gz  && \
-        tar -xzf /home/${USERNAME}/arduino-cli.tar.gz -C /usr/local/bin && \
-        rm -rf /home/${USERNAME}/arduino-cli.tar.gz
+# Install arduino-cli for amd64
+RUN curl -fsSL --retry 5 --fail https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz \
+        -o ~/arduino-cli.tar.gz && \
+    tar -xzf ~/arduino-cli.tar.gz -C /usr/local/bin && \
+    rm -rf ~/arduino-cli.tar.gz
 
 # Make the Arduino CLI binary executable
 RUN chmod +x /usr/local/bin/arduino-cli
@@ -144,7 +144,6 @@ RUN pip3 install --no-cache-dir \
     networkx \
     paho-mqtt \
     pymavlink
-
 
 FROM dependencies-python AS ros-initialize-catkin
 
