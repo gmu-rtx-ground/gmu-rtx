@@ -16,7 +16,7 @@
 
 #define USB_USBCON
 extern unsigned long lastMsgTime;
-extern ros::NodeHandle nodeHandle;
+extern ros::NodeHandle_<ArduinoHardware, 10, 10, 1024, 1024>  nodeHandle;
 void control_callback(const std_msgs::Float32MultiArray&  control_msg);
 extern sensor_msgs::Joy joyMsg;
 extern std_msgs::Float32MultiArray robotStatus;
