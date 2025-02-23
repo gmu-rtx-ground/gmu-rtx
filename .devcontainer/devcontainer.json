@@ -1,16 +1,21 @@
 {
   "name": "noetic desktop",
-  "dockerFile": "Dockerfile",
+  "image": "ghcr.io/gmu-rtx-ground/gmu-rtx:latest",
   "runArgs": [
     "--privileged",
-    "--network=host"
+    "--network=host",
+    "--cap-add=NET_ADMIN",
+    "--cap-add=SYS_ADMIN",
+    "--device=/dev/rfcomm0",
+    "--device=/dev/bus/usb",
+    "--device=/dev/ttyACM0",
+    "--volume=/var/run/dbus:/var/run/dbus"
   ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/ubuntu/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/home/ubuntu/${localWorkspaceFolderBasename}",
   "mounts": [
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.bash_history,target=/home/ubuntu/.vscode/.bash_history,type=bind",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/ubuntu/.gitconfig,type=bind",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/ubuntu/.ssh,type=bind"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/ubuntu/.gitconfig,type=bind"
   ],
   "customizations": {
     "vscode": {

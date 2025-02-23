@@ -1,0 +1,24 @@
+# Rover-specific moving base parameters
+frame_id: rover
+# debug: 1
+publish:
+  nav:
+    pvt: true
+    relposned: true
+    velned: true
+    sat: true
+    status: true
+    posecef: true
+
+  # rxm:
+  #   rawx: true
+rate: 10 
+nav_rate: 1
+
+device: /dev/ubloxGPS
+usb:
+  baudrate: 115200
+  in: 1 # UBX PROTOCOL
+  out: 1
+
+config_on_startup: false

@@ -1,0 +1,22 @@
+<launch>
+	<group ns="losi">
+
+	    <!-- witmotion_ros IMU -->
+	    <include file="$(find witmotion_ros)/launch/wt901.launch"/>
+	    <!--coordinate frame for IMU is set in driver's config yaml-->
+	    
+	    <!-- Ublox GPS -->
+	    <include file="$(find ublox_gps)/launch/rover.launch" />
+	    
+	    <!-- realsense Camera -->
+	    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch" / -->
+	    
+	    
+	    <!-- arduino -->
+	    <include file="$(find losi_launch)/launch/arduino_bringup.launch" />
+
+	    
+	    <!-- node name="dynamic_reconfigure_load_flir_right" pkg="dynamic_reconfigure" type="dynparam" args="load /sensor_suite/right_camera_optical/spinnaker_camera_nodelet/ $(find spinnaker_camera_driver)/params/right_triggered.yaml" / -->
+
+	</group>
+</launch>
