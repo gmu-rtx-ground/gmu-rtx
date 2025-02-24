@@ -69,6 +69,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
     ros-noetic-rosserial-python \
     ros-noetic-rospy \
     ros-noetic-rospy-tutorials \
+    ros-noetic-rqt-console \
     ros-noetic-rqt-graph \
     ros-noetic-rtcm-msgs \
     ros-noetic-witmotion-ros
