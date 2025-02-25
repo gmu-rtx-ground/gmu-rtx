@@ -26,6 +26,9 @@ jobs:
                 
   build:
     needs: filter
+    if: > 
+      needs.filter.outputs.amd64_changed == 'true'
+      || needs.filter.outputs.arm64_changed == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
