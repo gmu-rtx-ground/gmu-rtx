@@ -1,6 +1,5 @@
 #ifndef REMOTE_RC_H_
 #define REMOTE_RC_H_
-#endif
 
 #include <Arduino.h>
 #include "def.h"
@@ -21,14 +20,21 @@
 #define RX_PC_INTERRUPT            PCINT2_vect
 #define RX_PCINT_PIN_PORT          PINK
 
-extern volatile unsigned long lastRcTime;
-extern volatile uint16_t rcValue[PCINT_PIN_COUNT];
-extern float rcChannels[6];
-
-extern volatile uint8_t rcFailsafeCnt;
-extern uint16_t rcData[RC_CHANS];
+namespace rc {
+    extern volatile uint32_t lastRcTime;
+    extern volatile uint16_t rcValue[PCINT_PIN_COUNT];
+    extern float rcChannels[6];
+    extern volatile uint8_t rcFailsafeCnt;
+    extern volatile uint16_t rcData[RC_CHANS];
+    extern int ctrlEn;
+    extern float rcAcc;
+    extern float rcThr;
+    extern float rcSteering;
+}   // namespace rc
 
 void computeRC();
 void configureReceiver();
 void init_rc();
 void update_rc();
+
+#endif  // REMOTE_RC_H_
