@@ -15,7 +15,7 @@ jobs:
         code_changed: ${{ steps.filter.outputs.code_changed }}
       steps:
         - uses: actions/checkout@v4.2.2
-        - name: Check which Dockerfile(s) changed
+        - name: Check which file(s) have changed
           id: filter
           uses: dorny/paths-filter@v3
           with:
