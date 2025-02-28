@@ -1,5 +1,10 @@
 # gmu-rtx
 
+## Controlling the robot
+
+1. [Controlling the robot](/docs/controlling_robot.md)
+2. 
+
 ## ROS
 
 Coming soon
