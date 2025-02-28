@@ -25,9 +25,9 @@ jobs:
               arm64_changed:
                 - 'docker/Dockerfile.arm64'
               code_changed:
-                - 'Arduino/*'
-                - 'python/*'
-                - 'ROS/*'
+                - 'Arduino/**'
+                - 'python/**'
+                - 'ROS/**'
   build:
     needs: filter
     if: > 
