@@ -12,6 +12,7 @@ jobs:
       outputs:
         amd64_changed: ${{ steps.filter.outputs.amd64_changed }}
         arm64_changed: ${{ steps.filter.outputs.arm64_changed }}
+        code_changed: ${{ steps.filter.outputs.code_changed }}
       steps:
         - uses: actions/checkout@v4.2.2
         - name: Check which Dockerfile(s) changed
@@ -23,12 +24,15 @@ jobs:
                 - 'docker/Dockerfile.amd64'
               arm64_changed:
                 - 'docker/Dockerfile.arm64'
-                
+              code_changed:
+                - 'Arduino/*'
+                - 'python/*'
+                - 'ROS/*'
   build:
     needs: filter
     if: > 
-      needs.filter.outputs.amd64_changed == 'true'
-      || needs.filter.outputs.arm64_changed == 'true'
+      (needs.filter.outputs.amd64_changed == 'true' || needs.filter.outputs.arm64_changed == 'true')
+      || needs.filter.outputs.code_changed == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -64,6 +68,7 @@ jobs:
         if: >
           (matrix.arch == 'amd64' && needs.filter.outputs.amd64_changed == 'true')
           || (matrix.arch == 'arm64' && needs.filter.outputs.arm64_changed == 'true')
+          || needs.filter.outputs.code_changed == 'true'
         uses: docker/build-push-action@v6.14.0
         with:
           context: .
