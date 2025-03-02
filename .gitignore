@@ -2,3 +2,4 @@
 */obj/*
 *.pyc
 *.vscode/
+**/build/*

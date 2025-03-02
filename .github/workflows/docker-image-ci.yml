@@ -12,9 +12,10 @@ jobs:
       outputs:
         amd64_changed: ${{ steps.filter.outputs.amd64_changed }}
         arm64_changed: ${{ steps.filter.outputs.arm64_changed }}
+        arduino_changed: ${{ steps.filter.outputs.arduino_changed }}
       steps:
         - uses: actions/checkout@v4.2.2
-        - name: Check which Dockerfile(s) changed
+        - name: Check which file(s) have changed
           id: filter
           uses: dorny/paths-filter@v3
           with:
@@ -23,12 +24,69 @@ jobs:
                 - 'docker/Dockerfile.amd64'
               arm64_changed:
                 - 'docker/Dockerfile.arm64'
-                
-  build:
+              arduino:
+                - 'Arduino/**'
+              python:
+                - 'python/**'
+              ROS:
+                - 'ROS/**'
+
+  test-arduino:
     needs: filter
-    if: > 
-      needs.filter.outputs.amd64_changed == 'true'
-      || needs.filter.outputs.arm64_changed == 'true'
+    if: needs.filter.outputs.arduino == 'true'
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
+        platform: [ 'arduino:avr:mega' ]
+        include:
+          - arduino-platform: 'arduino:avr'
+            fqbn: 'arduino:avr:mega'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install board support
+        run: |
+          ardiuno-cli core update-index
+          arduino-cli core install ${{ matrix.arduino-platform }}
+
+      - name: Compile sketch
+        run: |
+          arduino-cli compile --fqbn ${{ matrix.fqbn }} ${{ github.workspace }}/Arduino/robot_controller
+
+  test-python:
+    needs: filter
+    if: needs.filter.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+  test-ros:
+    needs: filter
+    if: needs.filter.outputs.ROS == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+  build:
+    needs: [ filter, test-arduino ]
+    if: >
+      always() && 
+      ((needs.test-arduino.result == 'success' || needs.test-arduino.result == 'skipped') || 
+      (needs.test-python.result == 'success' || needs.test-python.result == 'skipped') ||
+      (needs.test-ros.result == 'success' || needs.test-ros.result == 'skipped') ||
+      (needs.filter.outputs.amd64_changed == 'true' || needs.filter.outputs.arm64_changed == 'true'))
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -61,9 +119,10 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Build & push ${{ matrix.arch }} image
-        if: >
+        if: |
           (matrix.arch == 'amd64' && needs.filter.outputs.amd64_changed == 'true')
           || (matrix.arch == 'arm64' && needs.filter.outputs.arm64_changed == 'true')
+          || needs.filter.outputs.code_changed == 'true'
         uses: docker/build-push-action@v6.14.0
         with:
           context: .

@@ -57,12 +57,16 @@ RUN sudo apt-get update && sudo apt-get install -y \
     python3-opencv \
     python3-pip \
     unzip \
+    usbutils \
     ros-noetic-common-tutorials \
     ros-noetic-ddynamic-reconfigure \
+    ros-noetic-geometry-msgs \
     ros-noetic-geometry-tutorials \
     ros-noetic-image-transport \
     ros-noetic-mavros \
     ros-noetic-mavros-extras \
+    ros-noetic-navigation \
+    ros-noetic-robot-localization \
     ros-noetic-roscpp \
     ros-noetic-rosserial \
     ros-noetic-rosserial-arduino \
@@ -72,6 +76,9 @@ RUN sudo apt-get update && sudo apt-get install -y \
     ros-noetic-rqt-console \
     ros-noetic-rqt-graph \
     ros-noetic-rtcm-msgs \
+    ros-noetic-sensor-msgs \
+    ros-noetic-tf2-geometry-msgs \
+    ros-noetic-tf2-msgs \
     ros-noetic-witmotion-ros
 
 # Add /home/ubuntu/.local/bin to the PATH
