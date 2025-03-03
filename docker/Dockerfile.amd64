@@ -34,12 +34,10 @@ RUN rosdep update
 # Source the ROS setup file
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 
-################################
-## ADD ANY CUSTOM SETUP BELOW ##
-################################
-
+# Multistage build for dependencies
 FROM ros-noetic-base AS dependencies-core
 
+# Set environment variables
 ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
 
 # Install system dependencies and useful tools
