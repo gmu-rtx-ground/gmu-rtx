@@ -221,5 +221,8 @@ RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 # Source the ROS workspace
 RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
 
+# Set the working directory to the project directory
+WORKDIR /home/${USERNAME}/gmu-rtx
+
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
