@@ -1,5 +1,7 @@
 # gmu-rtx
 
+[![Docker Image CI](https://github.com/gmu-rtx-ground/gmu-rtx/actions/workflows/docker-image-ci.yml/badge.svg?branch=main)](https://github.com/gmu-rtx-ground/gmu-rtx/actions/workflows/docker-image-ci.yml)
+
 ## Controlling the robot
 
 1. [Controlling the robot](/docs/controlling_robot.md)
