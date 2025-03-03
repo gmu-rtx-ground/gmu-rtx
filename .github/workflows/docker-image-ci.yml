@@ -87,6 +87,7 @@ jobs:
     needs: [ filter, test-arduino ]
     if: >
       always() && 
+      github.event_name != 'pull_request' &&
       ((needs.test-arduino.result == 'success' || needs.test-arduino.result == 'skipped') || 
       (needs.test-python.result == 'success' || needs.test-python.result == 'skipped') ||
       (needs.test-ros.result == 'success' || needs.test-ros.result == 'skipped') ||
