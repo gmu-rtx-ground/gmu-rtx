@@ -1,5 +1,9 @@
 # gmu-rtx
 
+[![gmu-rtx-logo](/static/gmu-rtx-logo.png)]
+
+---
+
 [![Docker Image CI](https://github.com/gmu-rtx-ground/gmu-rtx/actions/workflows/docker-image-ci.yml/badge.svg?branch=main)](https://github.com/gmu-rtx-ground/gmu-rtx/actions/workflows/docker-image-ci.yml)
 
 ## Controlling the robot
@@ -77,7 +81,7 @@ The project repos will be private prior to the competition. Private repos requir
 
 Users will need to pair [ssh keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) with their github.com account. For Windows users, it is recommended to follow these steps within the `wsl` context; i.e. follow the Linux steps rather than Windows when given the option.
 
-![Linux](static/Screenshot_20250210151100.png)
+![Linux](static/github-docs-screenshot.png)
 
 ### Docker
 
