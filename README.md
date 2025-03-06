@@ -1,6 +1,6 @@
 # gmu-rtx
 
-[![gmu-rtx-logo](/static/gmu-rtx-logo.png)]
+![gmu-rtx-logo](/static/gmu-rtx-logo.png)
 
 ---
 
@@ -9,7 +9,6 @@
 ## Controlling the robot
 
 1. [Controlling the robot](/docs/controlling_robot.md)
-2. 
 
 ## ROS
 
@@ -89,13 +88,15 @@ Docker will be leveraged to create a deterministic testing environment for the t
 
 There are multiple paths to using Docker depending on the development environment. For Windows users, it is recommended to use [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/). For Linux users, [Docker Engine](https://docs.docker.com/engine/) is likely sufficent.
 
-#### Docker Desktop
-
-For most Windows users, `Docker Desktop for Windows - x86_64` will be the correct version. It is **strongly recommended** to follow the installation instructions for `WSL 2 backend, x86_64`.
+> [!TIP]
+> For most Windows users, `Docker Desktop for Windows - x86_64` will be the correct version. It is **strongly recommended** to follow the installation instructions for `WSL 2 backend, x86_64`.
 
 #### Github Container Registry
 
 The project leverages [Github Container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) to manage the development Docker image. The team's [personal access token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) is required to establish a secure connection between the registry and the development environment.
+
+> [!IMPORTANT]
+> [@cnlee1702](https://github.com/cnlee1702) will provide project PAT as needed
 
 Github recommends storing the PAT as an [environment variable](https://www.geeksforgeeks.org/environment-variables-in-linux-unix/):
 
@@ -115,3 +116,22 @@ After authentication, users can pull the latest Docker image via:
 ```bash
 $ docker pull ghcr.io/gmu-rtx-ground/gmu-rtx
 ```
+
+#### gmu-rtx Image Lineage
+
+The project [gmu-rtx package](https://github.com/orgs/gmu-rtx-ground/packages/container/package/gmu-rtx) uses the official [ros:noetic](https://hub.docker.com/_/ros/) public Docker hub image as a base image. The project uses a Docker [multi-platform build](https://docs.docker.com/build/building/multi-platform/) to target both `linux/amd64` and `linux/arm64` platforms simultaneously. The `linux/amd64` image provides the team with a deterministic environment to build and test software components. The `linux/arm64` image provides assurance the team's solutions will function on the target `Jetson Xavier NX` platform. 
+
+> [!IMPORTANT]
+> Although the image is compatible with the target system, the intention is to leverage build scripts on the target platform rather than directly running the ground vehicle from within a Docker container.
+
+```mermaid
+graph LR;
+  ros:noetic-->Dockerfile.amd64;
+  ros:noetic-->id1([arm64-prerequisite.Dockerfile]);
+  id1([arm64-prerequisite.Dockerfile])-->Dockerfile.arm64;
+  Dockerfile.amd64-->gmu-rtx:latest;
+  Dockerfile.arm64-->gmu-rtx:latest;
+```
+
+The [arm64-prerequisite](docker/arm64-prerequisite.Dockerfile) image precompiles dependency libraries that are not available via `apt` for `arm64` platforms. This image is scheduled to build nightly at 12:00am UTC to keep CI/CD runtimes managable.
+
