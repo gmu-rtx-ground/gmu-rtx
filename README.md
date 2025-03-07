@@ -68,6 +68,18 @@ Suggested Extensions:
 
 **Required*
 
+#### .devcontainer
+
+Inside the .devcontainer directory, there are several files that are used to configure the development environment:
+
+- [devcontainer.json](.devcontainer/devcontainer.json) manages the Docker image and container configuration.
+- [entrypoint.sh](.devcontainer/entrypoint.sh) add runArgs for connected usb devices (IMU, GPS, etc.).
+- [detect-usb.sh](.devcontainer/detect-usb.sh) sets proper permissions for those connected usb devices.
+
+> [!NOTE]
+> The two scripts are mainly for the wsl environment to properly pass the device through windows to wsl and then give it the correct name and permissions.
+
+
 ### Github.com Account
 
 The project is leveraging github.com to manage the code repository as well as other tooling such as Docker images and ROS package customization.
