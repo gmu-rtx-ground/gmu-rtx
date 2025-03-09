@@ -11,10 +11,25 @@
 	    <!-- realsense Camera -->
 	    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch" / -->
 	    
-	    
 	    <!-- arduino -->
 	    <include file="$(find losi_launch)/launch/arduino_bringup.launch" />
 
+		<!-- Launch ekf_localization_node -->
+		<node pkg="robot_localization" type="ekf_localization_node" name="ekf_filter_node" output="screen">
+
+			<!-- Load the EKF configuration -->
+			<rosparam command="load" file="$(find your_package)/config/ekf_filter.yaml" />
+			<!-- Remap sensor topics -->
+			<remap from="imu0" to="/witmotion/imu" />
+			<remap from="gps0" to="/ublox/navsat_fix" />
+		</node>
+
+		 <!-- Launch Move Base -->
+		<node pkg="move_base" type="move_base" name="move_base" output="screen">
+			<rosparam file="$(find losi_launch)/config/move_base.yaml" command="load" />
+			<!-- Remap cmd topics -->
+			<remap from="cmd_vel" to "/cmd_vel1" />
+		</node>
 	    
 	    <!-- node name="dynamic_reconfigure_load_flir_right" pkg="dynamic_reconfigure" type="dynparam" args="load /sensor_suite/right_camera_optical/spinnaker_camera_nodelet/ $(find spinnaker_camera_driver)/params/right_triggered.yaml" / -->
 
