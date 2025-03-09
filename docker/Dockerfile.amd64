@@ -34,12 +34,10 @@ RUN rosdep update
 # Source the ROS setup file
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 
-################################
-## ADD ANY CUSTOM SETUP BELOW ##
-################################
-
+# Multistage build for dependencies
 FROM ros-noetic-base AS dependencies-core
 
+# Set environment variables
 ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
 
 # Install system dependencies and useful tools
@@ -195,6 +193,9 @@ RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 
 # Source the ROS workspace
 RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
+
+# Set the working directory to the project directory
+WORKDIR /home/${USERNAME}/gmu-rtx
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]

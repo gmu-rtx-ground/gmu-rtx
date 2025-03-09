@@ -1,45 +1,11 @@
-# Use the official ROS Noetic base image
-FROM ros:noetic AS ros-noetic-base
+# Multistage build for dependencies
+FROM ghcr.io/gmu-rtx-ground/gmu-rtx:arm64-prerequisite AS dependencies-core
 
-# Add ubuntu user with same UID and GID as your host system, if it doesn't already exist
-# Since Ubuntu 24.04, a non-root user is created by default with the name vscode and UID=1000
 ARG USERNAME=ubuntu
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-RUN if ! id -u $USER_UID >/dev/null 2>&1; then \
-        groupadd --gid $USER_GID $USERNAME && \
-        useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME; \
-    fi
-# Add sudo support for the non-root user
-RUN apt-get update && \
-    apt-get install -y sudo && \
-    echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME && \
-    chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Switch from root to user
-USER $USERNAME
-
-# Add user to video group to allow access to webcam
-RUN sudo usermod --append --groups video $USERNAME
-
-# Update all packages
-RUN sudo apt update && sudo apt upgrade -y
-
-# Install Git
-RUN sudo apt install -y git
-
-# Rosdep update
-RUN rosdep update
-
-# Source the ROS setup file
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
-
-################################
-## ADD ANY CUSTOM SETUP BELOW ##
-################################
-
-FROM ros-noetic-base AS dependencies-core
-
+# Set environment variables
 ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
 
 # Install system dependencies and useful tools
@@ -84,49 +50,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
 # Add /home/ubuntu/.local/bin to the PATH
 ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
 
-FROM dependencies-core AS dependencies-realsense2
-
-# Setup Intel RealSense SDK for arm64
-RUN sudo mkdir -p /etc/apt/keyrings
-RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee /etc/apt/keyrings/librealsense.pgp > /dev/null
-
-RUN echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo `lsb_release -cs` main" | \
-            sudo tee /etc/apt/sources.list.d/librealsense.list && \
-            sudo apt-get update
-
-# Install required dependency libraries
-RUN sudo apt-get install -y \
-        at \
-        cmake \
-        libglfw3-dev \
-        libgl1-mesa-dev \
-        libglu1-mesa-dev \
-        libgtk-3-dev \
-        librealsense2-utils \
-        librealsense2-dev \
-        librealsense2-dbg \
-        libssl-dev \
-        libudev-dev \
-        libusb-1.0-0-dev \
-        pkg-config \ 
-        wget
-
-# Clone RealSense repo and run initial dependency scripts
-RUN git clone https://github.com/IntelRealSense/librealsense.git /home/${USERNAME}/librealsense
-WORKDIR /home/${USERNAME}/librealsense
-RUN /bin/bash -c "./scripts/setup_udev_rules.sh"
-# RUN /bin/bash -c "./scripts/patch-realsense-ubuntu-lts-hwe.sh"
-
-# Build RealSense library from source
-RUN mkdir /home/${USERNAME}/librealsense/build
-WORKDIR /home/${USERNAME}/librealsense/build
-RUN cmake ../
-RUN sudo make uninstall 
-RUN make clean
-RUN make
-RUN sudo make -j$(($(nproc)-1)) install
-
-FROM dependencies-realsense2 AS dependencies-arduino
+FROM dependencies-core AS dependencies-arduino
 
 # Switch back to the root user to install the Arduino CLI
 USER root
@@ -137,8 +61,8 @@ RUN mkdir -p /usr/local/bin
 # Install arduino-cli for arm64
 RUN curl -fsSL --retry 5 --fail https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz \
         -o ~/arduino-cli.tar.gz && \
-    tar -xzf ~/arduino-cli.tar.gz -C /usr/local/bin && \
-    rm -rf ~/arduino-cli.tar.gz
+        tar -xzf ~/arduino-cli.tar.gz -C /usr/local/bin && \
+        rm -rf ~/arduino-cli.tar.gz
 
 # Make the Arduino CLI binary executable
 RUN chmod +x /usr/local/bin/arduino-cli
@@ -220,6 +144,9 @@ RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 
 # Source the ROS workspace
 RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
+
+# Set the working directory to the project directory
+WORKDIR /home/${USERNAME}/gmu-rtx
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
