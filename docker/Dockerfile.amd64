@@ -198,3 +198,6 @@ WORKDIR /home/${USERNAME}/gmu-rtx
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
+
+# Final step
+RUN echo "Done!"
