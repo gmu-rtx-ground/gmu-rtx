@@ -77,7 +77,8 @@ RUN arduino-cli config init && \
 
 # Install ros_lib in Arduino sketchbook directory
 WORKDIR /home/${USERNAME}/Arduino/libraries
-RUN rosrun rosserial_arduino make_libraries.py .
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
+                  rosrun rosserial_arduino make_libraries.py ."
 
 FROM dependencies-arduino AS dependencies-python
 
