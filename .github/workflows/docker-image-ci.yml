@@ -111,12 +111,17 @@ jobs:
 
   build:
     needs: build-check
-    if: needs.build-check.outputs.condition == 'true'
+    if: always()
     runs-on: ubuntu-latest
     strategy:
       matrix:
         arch: [ amd64, arm64 ]
     steps:
+      - name: Debug
+        id: debug
+        run: |
+          echo ${{ needs.build-check.outputs.condition }}
+
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
         if: steps.filer.outputs.condition == 'true'
@@ -131,6 +136,7 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+        if: steps.filer.outputs.condition == 'true'
 
       - name: Set up QEMU
         if: matrix.arch == 'arm64'
@@ -140,12 +146,14 @@ jobs:
       
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
+        if: steps.filer.outputs.condition == 'true'
         with:
           platforms: linux/${{ matrix.arch }}
           cache-binary: true
       
       - name: Login to GHCR
         uses: docker/login-action@v3
+        if: steps.filer.outputs.condition == 'true'
         with:
             registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
@@ -153,11 +161,13 @@ jobs:
 
       - name: Start SSH agent and add key
         uses: webfactory/ssh-agent@v0.9.0
+        if: steps.filer.outputs.condition == 'true'
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Build & push ${{ matrix.arch }} image
         uses: docker/build-push-action@v6
+        if: steps.filer.outputs.condition == 'true'
         with:
           context: .
           file: docker/Dockerfile.${{ matrix.arch }}
@@ -169,6 +179,7 @@ jobs:
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
+        if: steps.filer.outputs.condition == 'true'
         run: |
           mkdir -p ${{ runner.temp }}/digests
           digest="${{ steps.build.outputs.digest }}"
@@ -176,6 +187,7 @@ jobs:
 
       - name: Upload digest
         uses: actions/upload-artifact@v4
+        if: steps.filer.outputs.condition == 'true'
         with:
           name: digests-linux-${{ matrix.arch }}
           path: ${{ runner.temp }}/digests/*

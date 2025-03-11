@@ -121,10 +121,7 @@ USER $USERNAME
 # Install the required Arduino libraries
 RUN arduino-cli config init && \
     arduino-cli core update-index && \
-    arduino-cli core install arduino:avr && \
-    arduino-cli lib install AS5600 && \
-    arduino-cli lib install Encoder && \
-    arduino-cli lib install Servo
+    arduino-cli core install arduino:avr
 
 # Install ros_lib in Arduino sketchbook directory
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
@@ -151,6 +148,9 @@ RUN pip3 install --no-cache-dir \
     paho-mqtt \
     pymavlink
 
+# Clear pip cache
+RUN pip3 cache purge -y
+
 FROM dependencies-python AS ros-initialize-catkin
 
 # Initialize the ROS workspace
@@ -176,8 +176,8 @@ RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/losi_launch /home/${USERNAME}/catkin_ws/
     ln -s /home/${USERNAME}/gmu-rtx/ROS/witmotion_IMU_ros /home/${USERNAME}/catkin_ws/src/witmotion_IMU_ros
 
 # Grant permissions to the user
-RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS}
-RUN chown -R ${USER_UID}:${USER_GID} /home/${USERNAME}/gmu-rtx
+RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS} & \
+    chown -R ${USER_UID}:${USER_GID} /home/${USERNAME}/gmu-rtx
 
 # Switch back to the non-root user
 USER ${USERNAME}
@@ -185,11 +185,10 @@ USER ${USERNAME}
 # Build the ROS workspace
 WORKDIR /home/${USERNAME}/catkin_ws
 
-# Initialize the workspace
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin init"
-
-# Build the workspace
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
+# Initialize and build the workspace
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
+                    catkin init && \
+                    catkin build"
 
 # Source the ROS workspace
 RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
