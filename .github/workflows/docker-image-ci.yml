@@ -90,6 +90,7 @@ jobs:
 
   build-check:
     needs: [ filter, test-arduino, test-python, test-ros ]
+    if: always()
     runs-on: ubuntu-latest
     outputs:
       condition: ${{ steps.filter.outputs.condition }}
