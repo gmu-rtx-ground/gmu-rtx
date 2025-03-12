@@ -49,7 +49,7 @@ RUN sudo apt-get update && \
         ros-noetic-tf2-geometry-msgs \
         ros-noetic-tf2-msgs \
         ros-noetic-witmotion-ros && \
-    rm -rf /var/lib/apt/lists/*
+    sudo rm -rf /var/lib/apt/lists/*
 
 # Add /home/ubuntu/.local/bin to the PATH
 ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
