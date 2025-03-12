@@ -49,6 +49,7 @@ RUN sudo apt-get update && \
         curl \
         dbus \
         iputils-ping \
+        liburdfdom-tools \
         libopencv-dev \
         nano \
         net-tools \
