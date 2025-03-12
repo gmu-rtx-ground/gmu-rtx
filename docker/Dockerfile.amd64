@@ -102,7 +102,7 @@ RUN sudo apt-get install --no-install-recommends -y \
             librealsense2-utils \
             librealsense2-dev \
             librealsense2-dbg && \
-        rm -rf /var/lib/apt/lists/*
+    sudo rm -rf /var/lib/apt/lists/*
 
 FROM dependencies-realsense2 AS dependencies-arduino
 
