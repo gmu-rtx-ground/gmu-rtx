@@ -15,10 +15,10 @@
 	    <!-- include file="$(find losi_launch)/launch/arduino_bringup.launch" / -->
 
 		<!-- Launch navsat_transform_node -->
-		<include file="$(find losi_launch)/launch/navsat_transform_node.launch" />
+		<!-- <include file="$(find losi_launch)/launch/navsat_transform_node.launch" /> -->
 		
 		<!-- Launch ekf_localization_node -->
-		<!-- <include file="$(find losi_launch)/launch/ekf_localization_node.launch" /> -->
+		<include file="$(find losi_launch)/launch/ekf_localization_node.launch" />
 		
 
 		 <!-- Launch Move Base -->
