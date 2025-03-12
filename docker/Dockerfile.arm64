@@ -8,44 +8,48 @@ ARG USER_GID=$USER_UID
 # Set environment variables
 ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
 
-# Install system dependencies and useful tools
-RUN sudo apt-get update && sudo apt-get install -y \
-    apt-transport-https \
-    bluez \
-    build-essential \
-    curl \
-    dbus \
-    iputils-ping \
-    libopencv-dev \
-    nano \
-    net-tools \
-    openssh-client \
-    python3-opencv \
-    python3-pip \
-    unzip \
-    usbutils \
-    ros-noetic-common-tutorials \
-    ros-noetic-ddynamic-reconfigure \
-    ros-noetic-geometry-msgs \
-    ros-noetic-geometry-tutorials \
-    ros-noetic-image-transport \
-    ros-noetic-mavros \
-    ros-noetic-mavros-extras \
-    ros-noetic-navigation \
-    ros-noetic-robot-localization \
-    ros-noetic-roscpp \
-    ros-noetic-rosserial \
-    ros-noetic-rosserial-arduino \
-    ros-noetic-rosserial-python \
-    ros-noetic-rospy \
-    ros-noetic-rospy-tutorials \
-    ros-noetic-rqt-console \
-    ros-noetic-rqt-graph \
-    ros-noetic-rtcm-msgs \
-    ros-noetic-sensor-msgs \
-    ros-noetic-tf2-geometry-msgs \
-    ros-noetic-tf2-msgs \
-    ros-noetic-witmotion-ros
+RUN sudo apt-get update && \
+    sudo apt-get install --no-install-recommends -y \
+        apt-transport-https \
+        bluez \
+        build-essential \
+        curl \
+        dbus \
+        iputils-ping \
+        libopencv-dev \
+        nano \
+        net-tools \
+        openssh-client \
+        python3-opencv \
+        python3-pip \
+        software-properties-common \
+        unzip \
+        usbutils \
+        ros-dev-tools \
+        ros-noetic-common-tutorials \
+        ros-noetic-ddynamic-reconfigure \
+        ros-noetic-geometry-msgs \
+        ros-noetic-geometry-tutorials \
+        ros-noetic-image-transport \
+        ros-noetic-mavros \
+        ros-noetic-mavros-extras \
+        ros-noetic-navigation \
+        ros-noetic-robot-localization \
+        ros-noetic-roscpp \
+        ros-noetic-rosserial \
+        ros-noetic-rosserial-arduino \
+        ros-noetic-rosserial-python \
+        ros-noetic-rospy \
+        ros-noetic-rospy-tutorials \
+        ros-noetic-rqt-console \
+        ros-noetic-rqt-graph \
+        ros-noetic-rtcm-msgs \
+        ros-noetic-rviz \
+        ros-noetic-sensor-msgs \
+        ros-noetic-tf2-geometry-msgs \
+        ros-noetic-tf2-msgs \
+        ros-noetic-witmotion-ros && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add /home/ubuntu/.local/bin to the PATH
 ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
@@ -82,25 +86,22 @@ RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
 
 FROM dependencies-arduino AS dependencies-python
 
-# Upgrade pip
-RUN pip3 install --upgrade pip
-
 # Install lightweight Python libraries for robotics
-RUN pip3 install --no-cache-dir \
-    numpy \
-    scipy \
-    transforms3d \
-    pyquaternion \
-    pyserial \
-    opencv-python \
-    rospkg \
-    catkin-tools \
-    networkx \
-    paho-mqtt \
-    pymavlink
-
-# Clear pip cache
-RUN pip3 cache purge
+RUN pip3 install --upgrade pip --no-cache-dir && \
+    pip3 install --no-cache-dir \
+        numpy \
+        scipy \
+        transforms3d \
+        pyquaternion \
+        pyserial \
+        opencv-python \
+        rospkg \
+        catkin-tools \
+        networkx \
+        paho-mqtt \
+        pymavlink \
+        utm \
+        witmotion
 
 FROM dependencies-python AS ros-initialize-catkin
 
@@ -149,6 +150,3 @@ WORKDIR /home/${USERNAME}/gmu-rtx
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
-
-# Finished
-RUN echo "Done!"
