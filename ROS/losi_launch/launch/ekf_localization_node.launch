@@ -1,0 +1,24 @@
+<!-- 
+Odometry config order
+[x,         y,          z,        # Position
+ roll,      pitch,      yaw,      # Orientation
+ x vel,     y vel,      z vel,    # Linear Velocity   
+ roll vel,  pitch vel,  yaw vel,  # Angular Velocity
+ x accel,   y accel,    z accel ] # Linear acceleration
+
+
+ -->
+
+<launch>
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_node" respawn="true">
+        <param name="imu0" value="/losi/witmotion_imu/imu"/>
+        <!-- <param name="map_frame" value="map"/> -->
+        <param name="odom0" value"/losi/odometry/filtered"/>
+        <rosparam param="imu0_config">[false , false , false ,
+                                       true  , true  , true  ,
+                                       false , false , false ,
+                                       true  , true  , true  ,
+                                       false , false , false ]</rosparam> 
+        
+    </node>
+</launch>

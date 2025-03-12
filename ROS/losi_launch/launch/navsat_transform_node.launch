@@ -1,0 +1,11 @@
+<launch>
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true">
+        <param name="magnetic_declination_radians" value="0"/>
+        <param name="yaw_offset" value="0"/>
+        <param name="publish_filtered_gps" value="true"/>
+        <param name="broadcast_cartesian_transform" value="true"/>
+
+        <remap from="/imu/data" to="/losi/witmotion_imu/imu"/>
+        <remap from="/gps/fix" to="/losi/f9p_rover/fix"/>
+    </node>
+</launch>

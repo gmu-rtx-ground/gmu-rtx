@@ -11,5 +11,7 @@
   <run_depend>realsense2_camera</run_depend>
   <run_depend>ublox_gps</run_depend>
   <run_depend>rosserial_python</run_depend>
+  <run_depend>robot_localization</run_depend>
+  <run_depend>move_base</run_depend>
 
 </package>
