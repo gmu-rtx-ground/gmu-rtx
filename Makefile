@@ -13,7 +13,7 @@ links:
 	@echo "Creating symlinks for ROS packages..."
 	@for dir in $(SRC_BASE)/*; do \
 		name=$$(basename $$dir); \
-		if [[ "$$name" = "udev_rules" || ! -d "$$dir" ]]; then \
+		if [ "$$name" = "udev_rules" -o ! -d "$$dir" ]; then \
 			continue; \
 		fi; \
 		ln -s "$(SRC_BASE)/$$name" "$(DST_BASE)/$$name"; \
