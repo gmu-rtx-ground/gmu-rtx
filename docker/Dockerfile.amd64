@@ -2,7 +2,6 @@
 FROM ros:noetic AS ros-noetic-base
 
 # Add ubuntu user with same UID and GID as your host system, if it doesn't already exist
-# Since Ubuntu 24.04, a non-root user is created by default with the name vscode and UID=1000
 ARG USERNAME=ubuntu
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
@@ -10,192 +9,136 @@ RUN if ! id -u $USER_UID >/dev/null 2>&1; then \
         groupadd --gid $USER_GID $USERNAME && \
         useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME; \
     fi
+
 # Add sudo support for the non-root user
-RUN apt-get update && \
-    apt-get install -y sudo && \
+RUN apt update && \
+    apt install -y sudo && \
     echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME && \
-    chmod 0440 /etc/sudoers.d/$USERNAME
+    chmod 0440 /etc/sudoers.d/$USERNAME && \
+    usermod --append --groups video ${USERNAME}
 
-# Switch from root to user
-USER $USERNAME
-
-# Add user to video group to allow access to webcam
-RUN sudo usermod --append --groups video $USERNAME
-
-# Update all packages
-RUN sudo apt update && sudo apt upgrade -y
-
-# Install Git
-RUN sudo apt install -y git
+# Set environment variables
+ENV QT_X11_NO-MITSHM=1 \
+    CPLUS_INCLUDE_PATH=/opt/ros/noetic/include \
+    LD_LIBRARY_PATH=/opt/ros/noetic/lib \
+    CATKIN_WS=/home/${USERNAME}/catkin_ws \
+    USR_HOME=/home/${USERNAME} \
+    GMU_RTX=/home/${USERNAME}/gmu-rtx
 
 # Rosdep update
 RUN rosdep update
 
 # Source the ROS setup file
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> "${USR_HOME}/.bashrc"
 
 # Multistage build for dependencies
 FROM ros-noetic-base AS dependencies-core
 
-# Set environment variables
-ENV QT_X11_NO-MITSHM=1 CPLUS_INCLUDE_PATH=/opt/ros/noetic/include LD_LIBRARY_PATH=/opt/ros/noetic/lib CATKIN_WS=/home/${USERNAME}/catkin_ws
+# Copy apt package manifest into container
+COPY ./apt-packages.txt /tmp/apt-packages.txt
 
 # Install system dependencies and useful tools
-RUN sudo apt-get update && sudo apt-get install -y \
-    apt-transport-https \
-    bluez \
-    build-essential \
-    curl \
-    dbus \
-    iputils-ping \
-    libopencv-dev \
-    nano \
-    net-tools \
-    openssh-client \
-    python3-opencv \
-    python3-pip \
-    unzip \
-    usbutils \
-    ros-noetic-common-tutorials \
-    ros-noetic-ddynamic-reconfigure \
-    ros-noetic-geometry-msgs \
-    ros-noetic-geometry-tutorials \
-    ros-noetic-image-transport \
-    ros-noetic-mavros \
-    ros-noetic-mavros-extras \
-    ros-noetic-navigation \
-    ros-noetic-robot-localization \
-    ros-noetic-roscpp \
-    ros-noetic-rosserial \
-    ros-noetic-rosserial-arduino \
-    ros-noetic-rosserial-python \
-    ros-noetic-rospy \
-    ros-noetic-rospy-tutorials \
-    ros-noetic-rqt-console \
-    ros-noetic-rqt-graph \
-    ros-noetic-rtcm-msgs \
-    ros-noetic-sensor-msgs \
-    ros-noetic-tf2-geometry-msgs \
-    ros-noetic-tf2-msgs \
-    ros-noetic-witmotion-ros
+RUN apt update && \
+    xargs -a /tmp/apt-packages.txt apt install --no-install-recommends -y && \
+    apt autoremove --purge -y && \
+    apt autoclean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add /home/ubuntu/.local/bin to the PATH
-ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
+ENV PATH="${USR_HOME}/.local/bin:${PATH}"
 
 FROM dependencies-core AS dependencies-realsense2
 
-# Setup Intel RealSense SDK for amd64
-RUN sudo mkdir -p /etc/apt/keyrings
-RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee /etc/apt/keyrings/librealsense.pgp > /dev/null
+# Switch to non-root user -- required for RealSense
+USER ${USERNAME}
 
-RUN echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo `lsb_release -cs` main" | \
-            sudo tee /etc/apt/sources.list.d/librealsense.list && \
-            sudo apt-get update
-            
-RUN sudo apt-get install -y \
-            librealsense2-dkms \
-            librealsense2-utils \
-            librealsense2-dev \
-            librealsense2-dbg
+# Setup Intel RealSense SDK for amd64
+RUN sudo mkdir -p /etc/apt/keyrings && \
+    curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | sudo tee /etc/apt/keyrings/librealsense.pgp > /dev/null && \
+    echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo `lsb_release -cs` main" | \
+    sudo tee /etc/apt/sources.list.d/librealsense.list && \
+    sudo apt update
+
+RUN sudo apt install --no-install-recommends -y \
+        librealsense2-dkms \
+        librealsense2-utils \
+        librealsense2-dev \
+        librealsense2-dbg && \
+    sudo rm -rf /var/lib/apt/lists/*
+
+# Switch back to root
+USER root
 
 FROM dependencies-realsense2 AS dependencies-arduino
 
-# Switch back to the root user to install the Arduino CLI
-USER root
-
-# Create a directory for the Arduino CLI binary
-RUN mkdir -p /usr/local/bin
-
 # Install arduino-cli for amd64
-RUN curl -fsSL --retry 5 --fail https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz \
+RUN mkdir -p /usr/local/bin && \
+    curl -fsSL --retry 5 --fail https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz \
         -o ~/arduino-cli.tar.gz && \
     tar -xzf ~/arduino-cli.tar.gz -C /usr/local/bin && \
-    rm -rf ~/arduino-cli.tar.gz
-
-# Make the Arduino CLI binary executable
-RUN chmod +x /usr/local/bin/arduino-cli
-
-# Switch back to the non-root user
-USER $USERNAME
+    rm -rf ~/arduino-cli.tar.gz && \
+    chmod +x /usr/local/bin/arduino-cli
 
 # Install the required Arduino libraries
 RUN arduino-cli config init && \
     arduino-cli core update-index && \
-    arduino-cli core install arduino:avr && \
-    arduino-cli lib install AS5600 && \
-    arduino-cli lib install Encoder && \
-    arduino-cli lib install Servo
+    arduino-cli core install arduino:avr
 
 # Install ros_lib in Arduino sketchbook directory
+WORKDIR ${USR_HOME}/Arduino/libraries
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
-                  cd /home/${USERNAME}/Arduino/libraries && \
                   rosrun rosserial_arduino make_libraries.py ."
-
 
 FROM dependencies-arduino AS dependencies-python
 
-# Upgrade pip
-RUN pip3 install --upgrade pip
+# Copy requirements.txt into container
+COPY ./requirements.txt /tmp/requirements.txt
 
 # Install lightweight Python libraries for robotics
-RUN pip3 install --no-cache-dir \
-    numpy \
-    scipy \
-    transforms3d \
-    pyquaternion \
-    pyserial \
-    opencv-python \
-    rospkg \
-    catkin-tools \
-    networkx \
-    paho-mqtt \
-    pymavlink
+RUN pip3 install --upgrade pip --no-cache-dir && \
+    pip3 install --no-cache-dir -r /tmp/requirements.txt 
 
 FROM dependencies-python AS ros-initialize-catkin
 
-# Initialize the ROS workspace
-RUN mkdir -p /home/${USERNAME}/catkin_ws/src
+# Create the catkin_ws directories
+RUN mkdir -p "${CATKIN_WS}/src"
 
 # Setup SSH keys
-USER root
 RUN mkdir -p -m 0700 /root/.ssh && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Clone the gmu-rtx repo 
 RUN --mount=type=ssh \
-    git clone git@github.com:gmu-rtx-ground/gmu-rtx.git /home/${USERNAME}/gmu-rtx
+    git clone --recursive git@github.com:gmu-rtx-ground/gmu-rtx.git ${GMU_RTX} && \
+    cd ${GMU_RTX} && \
+    git submodule update --init --recursive
 
 # Add udev rules for modules from gmu-rtx repo
-RUN sudo cp /home/${USERNAME}/gmu-rtx/ROS/udev_rules/* /etc/udev/rules.d/
+RUN cp ${GMU_RTX}/ROS/udev_rules/* /etc/udev/rules.d/
 
 # Create Symbolic link for the ROS workspace
-RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/losi_launch /home/${USERNAME}/catkin_ws/src/losi_launch
-RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/realsense-ros /home/${USERNAME}/catkin_ws/src/realsense-ros
-RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/ublox-F9P /home/${USERNAME}/catkin_ws/src/ublox-F9P
-RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/vision_opencv /home/${USERNAME}/catkin_ws/src/vision_opencv
-RUN ln -s /home/${USERNAME}/gmu-rtx/ROS/witmotion_IMU_ros /home/${USERNAME}/catkin_ws/src/witmotion_IMU_ros
+RUN HOME=${USR_HOME} && cd ${GMU_RTX} && make links
 
 # Grant permissions to the user
-RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS}
-RUN chown -R ${USER_UID}:${USER_GID} /home/${USERNAME}/gmu-rtx
-
-# Switch back to the non-root user
-USER ${USERNAME}
+RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS} & \
+    chown -R ${USER_UID}:${USER_GID} ${GMU_RTX}
 
 # Build the ROS workspace
-WORKDIR /home/${USERNAME}/catkin_ws
+WORKDIR ${CATKIN_WS}
 
-# Initialize the workspace
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin init"
-
-# Build the workspace
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
+# Initialize and build the workspace
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
+                    catkin init && \
+                    catkin build && \
+                    catkin test"
 
 # Source the ROS workspace
-RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> /home/${USERNAME}/.bashrc
+RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> ${USR_HOME}/.bashrc
 
 # Set the working directory to the project directory
-WORKDIR /home/${USERNAME}/gmu-rtx
+WORKDIR ${GMU_RTX}
+
+USER ${USERNAME}
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]

@@ -1,0 +1,13 @@
+numpy
+scipy
+transforms3d
+pyquaternion
+pyserial
+opencv-python
+rospkg
+catkin-tools
+networkx
+paho-mqtt
+pymavlink
+utm
+witmotion
