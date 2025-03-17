@@ -8,10 +8,11 @@
 
             <visual>
                 <origin rpy="0 0 0" xyz="-0.2 0 -0.12"/>
-                <!-- <geometry> -->
+                <geometry>
                     <!-- <mesh filename="file:///home/aniket/Documents/MPPI_vertiFormer/mesh/v4w.obj" scale="1 1 1"/> -->
                     <!-- <mesh filename="package://losi_launch/meshes/v4w.obj" scale="1 1 1"/> -->
-                <!-- </geometry> -->
+                    <box size="1.0 1.3 1.1"/>
+                </geometry>
                 <material name="grey"/>
             </visual>
 
@@ -23,10 +24,11 @@
 
             <collision>
               <origin rpy="1.5708 0 0" xyz="-0.2 0 -0.1"/>
-                <!-- <geometry> -->
+                <geometry>
                     <!-- <mesh filename="file:///home/aniket/Documents/MPPI_vertiFormer/mesh/v4w.stl" scale="1 1 1"/> -->
                     <!-- <mesh filename="package://losi_launch/meshes/v4w.stl" scale="1 1 1"/> -->
-                <!-- </geometry> -->
+                    <box size="1.0 1.3 1.1"/>
+                </geometry>
             </collision>
         </link>
 

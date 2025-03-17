@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Top-Level URDF for Ground Robot -->
-<xacro:robot name="gmu-rtx-ground" xmlns:xacro="http://ros.org/wiki/xacros">
+<robot name="gmu-rtx-ground" xmlns:xacro="http://ros.org/wiki/xacros">
 
   <!-- Load chassis -->
   <xacro:include filename="chassis.urdf.xacro"/>
@@ -15,4 +15,4 @@
   <xacro:chassis/>
   <xacro:sensors/>
 
-</xacro:robot>
+</robot>
