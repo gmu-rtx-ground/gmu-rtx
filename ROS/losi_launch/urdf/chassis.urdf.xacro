@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacros">
+
+    <xacro:macro name="chassis" params="">
+
+        <link name="base_link">
+
+            <visual>
+                <origin rpy="0 0 0" xyz="-0.2 0 -0.12"/>
+                <!-- <geometry> -->
+                    <!-- <mesh filename="file:///home/aniket/Documents/MPPI_vertiFormer/mesh/v4w.obj" scale="1 1 1"/> -->
+                    <!-- <mesh filename="package://losi_launch/meshes/v4w.obj" scale="1 1 1"/> -->
+                <!-- </geometry> -->
+                <material name="grey"/>
+            </visual>
+
+            <intertial>
+                <mass value="5.0"/>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+            </intertial>
+
+            <collision>
+              <origin rpy="1.5708 0 0" xyz="-0.2 0 -0.1"/>
+                <!-- <geometry> -->
+                    <!-- <mesh filename="file:///home/aniket/Documents/MPPI_vertiFormer/mesh/v4w.stl" scale="1 1 1"/> -->
+                    <!-- <mesh filename="package://losi_launch/meshes/v4w.stl" scale="1 1 1"/> -->
+                <!-- </geometry> -->
+            </collision>
+        </link>
+
+        <!-- Front axle -->
+        <joint name="front_left_steering_joint" type="revolute">
+            <parent link="base_link"/>
+            <child link="front_left_wheel_link"/>
+            <origin xyz="0.3 0.18 -0.07" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/> <!-- steer around Z (yaw) -->
+            <limit lower="-0.5236" upper="0.5236" effort="10" velocity="1.0"/>
+        </joint>
+
+        <link name="front_left_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.07" length="0.04"/>
+                </geometry>
+                <material name="grey"/>
+            </visual>
+      
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="0.5"/>
+                <inertia ixx="1e-3" iyy="1e-3" izz="1e-3"
+                        ixy="0" ixz="0" iyz="0"/>
+            </inertial>
+        </link>
+
+        <joint name="front_right_steering_joint" type="revolute">
+            <parent link="base_link"/>
+            <child link="front_right_wheel_link"/>
+            <origin xyz="0.3 -0.18 -0.07" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="-0.5236" upper="0.5236" effort="10" velocity="1.0"/>
+        </joint>
+
+        <link name="front_right_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.07" length="0.04"/>
+                </geometry>
+                <material name="grey"/>
+            </visual>
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="0.5"/>
+                <inertia ixx="1e-3" iyy="1e-3" izz="1e-3"
+                        ixy="0" ixz="0" iyz="0"/>
+            </inertial>
+        </link>
+
+        <!-- Back axle -->
+
+        <joint name="rear_left_wheel_joint" type="continuous">
+            <parent link="base_link"/>
+            <child link="rear_left_wheel_link"/>
+            <origin xyz="-0.3 0.18 -0.07" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <link name="rear_left_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.07" length="0.04"/>
+                </geometry>
+                <material name="grey"/>
+            </visual>
+
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="0.5"/>
+                <inertia ixx="1e-3" iyy="1e-3" izz="1e-3"
+                        ixy="0" ixz="0" iyz="0"/>
+            </inertial>
+        </link>
+
+        
+        <joint name="rear_right_wheel_joint" type="continuous">
+            <parent link="base_link"/>
+            <child link="rear_right_wheel_link"/>
+            <origin xyz="-0.3 -0.18 -0.07" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <link name="rear_right_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.07" length="0.04"/>
+                </geometry>
+                <material name="grey"/>
+            </visual>
+
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="0.5"/>
+                <inertia ixx="1e-3" iyy="1e-3" izz="1e-3"
+                        ixy="0" ixz="0" iyz="0"/>
+            </inertial>
+        </link>
+
+    </xacro:macro>
+
+</robot>
