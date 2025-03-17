@@ -20,6 +20,14 @@ odom0_queue_size: 10
 odom0_pose_rejection_threshold: 5.0
 odom0_twist_rejection_threshold: 1.0
 
+#Increase position covariance to reduce trust in odometry
+odom0_pose_covariance: [0.1, 0.0, 0.0, 0.0, 0.0, 0.0,    # x (was 0.001)
+                        0.0, 0.1, 0.0, 0.0, 0.0, 0.0,    # y (was 0.001)
+                        0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0,  # z
+                        0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0,  # roll
+                        0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0,  # pitch
+                        0.0, 0.0, 0.0, 0.0, 0.0, 1000.0]     # yaw
+
 # IMU sensor
 imu0: /imu
 imu0_config: [false, false, false,   # x, y, z
@@ -41,6 +49,14 @@ odom1_config: [true,  true,  false,   # x, y, z
 odom1_differential: false
 odom1_queue_size: 10
 odom1_pose_rejection_threshold: 5.0
+
+# Decrease position covariance to increase trust in GPS
+odom1_pose_covariance: [0.002, 0.0, 0.0, 0.0, 0.0, 0.0,    # x (was 0.005625)
+                        0.0, 0.002, 0.0, 0.0, 0.0, 0.0,    # y (was 0.005625)
+                        0.0, 0.0, 0.01, 0.0, 0.0, 0.0,     # z (was 0.011236)
+                        0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0,  # roll
+                        0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0,  # pitch
+                        0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0]  # yaw
 
 # Initial state covariance
 initial_estimate_covariance: [1e-9, 0,    0,    0,    0,    0,
