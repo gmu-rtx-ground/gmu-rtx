@@ -20,10 +20,13 @@ ros-noetic-ddynamic-reconfigure
 ros-noetic-geometry-msgs
 ros-noetic-geometry-tutorials
 ros-noetic-image-transport
+ros-noetic-joint-state-publisher
+ros-noetic-joint-state-publisher-gui
 ros-noetic-mavros
 ros-noetic-mavros-extras
 ros-noetic-navigation
 ros-noetic-robot-localization
+ros-noetic-robot-state-publisher
 ros-noetic-roscpp
 ros-noetic-roslint
 ros-noetic-rosserial
@@ -33,6 +36,7 @@ ros-noetic-rospy
 ros-noetic-rospy-tutorials
 ros-noetic-rqt-console
 ros-noetic-rqt-graph
+ros-noetic-rqt_tf_tree
 ros-noetic-rtcm-msgs
 ros-noetic-rviz
 ros-noetic-sensor-msgs
