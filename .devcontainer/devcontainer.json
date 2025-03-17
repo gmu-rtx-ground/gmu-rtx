@@ -27,6 +27,7 @@
         "ms-vscode.cpptools-extension-pack",
         "ms-vscode.hexeditor",
         "ms-vscode.makefile-tools",
+        "ms-iot.vscode-ros",
         "codezombiech.gitignore",
         "redhat.vscode-xml",
         "redhat.vscode-yaml"
