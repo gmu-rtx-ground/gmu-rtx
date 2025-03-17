@@ -25,6 +25,7 @@ ros-noetic-mavros-extras
 ros-noetic-navigation
 ros-noetic-robot-localization
 ros-noetic-roscpp
+ros-noetic-roslint
 ros-noetic-rosserial
 ros-noetic-rosserial-arduino
 ros-noetic-rosserial-python
@@ -38,3 +39,5 @@ ros-noetic-sensor-msgs
 ros-noetic-tf2-geometry-msgs
 ros-noetic-tf2-msgs
 ros-noetic-witmotion-ros
+ros-noetic-xacro
+liburdfdom-tools
