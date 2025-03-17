@@ -1,7 +1,0 @@
-[submodule "ROS/xacro"]
-	path = ROS/xacro
-	url = https://github.com/ros/xacro.git
-	branch = noetic-devel
-[submodule "ROS/roslint"]
-	path = ROS/roslint
-	url = https://github.com/ros/roslint.git
