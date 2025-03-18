@@ -91,7 +91,7 @@
             <visual>
             <origin xyz="0 0.2 0" rpy="1.5708 0 0"/>
             <geometry>
-                <cylinder radius="0.07" length="0.04"/>
+                <cylinder radius="0.12" length="0.04"/>
             </geometry>
             <material name="black"/>
             </visual>
@@ -108,7 +108,7 @@
             <visual>
             <origin xyz="0 -0.2 0" rpy="1.5708 0 0"/>
             <geometry>
-                <cylinder radius="0.07" length="0.04"/>
+                <cylinder radius="0.12" length="0.04"/>
             </geometry>
             <material name="black"/>
             </visual>
@@ -142,7 +142,7 @@
             <visual>
             <origin xyz="0 0.2 0" rpy="1.5708 0 0"/>
             <geometry>
-                <cylinder radius="0.07" length="0.04"/>
+                <cylinder radius="0.12" length="0.04"/>
             </geometry>
             <material name="black"/>
             </visual>
@@ -159,7 +159,7 @@
             <visual>
             <origin xyz="0 -0.2 0" rpy="1.5708 0 0"/>
             <geometry>
-                <cylinder radius="0.07" length="0.04"/>
+                <cylinder radius="0.12" length="0.04"/>
             </geometry>
             <material name="black"/>
             </visual>
