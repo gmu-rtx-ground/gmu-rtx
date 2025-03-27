@@ -2,7 +2,7 @@
 	<group ns="losi">
 
 	    <!-- witmotion_ros IMU -->
-	    <include file="$(find witmotion_ros)/launch/wt901.launch"/>
+	    <include file="$(find witmotion_IMU_ros)/launch/wt901.launch"/>
 	    <!--coordinate frame for IMU is set in driver's config yaml-->
 	    
 	    <!-- Ublox GPS -->
