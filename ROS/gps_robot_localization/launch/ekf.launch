@@ -17,10 +17,10 @@
 
   <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true">
     <rosparam file="$(find gps_robot_localization)/config/navsat_config.yaml" command="load" />
-    <remap from="/imu/data" to="/imu" />
-    <remap from="/gps/fix" to="/f9p_rover/fix_synced" />
-    <remap from="/odometry/filtered" to="/odometry/fused" />
-    <remap from="/odometry/gps" to="/gps/odom" />
+    <remap from="/imu/data" to="/losi/witmotion_imu/imu" />
+    <remap from="/gps/fix" to="/losi/f9p_rover/fix" />
+    <!-- <remap from="/odometry/filtered" to="/odometry/fused" /> -->
+    <!-- <remap from="/odometry/gps" to="/gps/odom" /> -->
     <param name="transform_time_offset" value="0.1" />
     <param name="transform_timeout" value="0.1" />
   </node>
