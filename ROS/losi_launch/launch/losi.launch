@@ -14,9 +14,6 @@
 	    <!-- arduino -->
 	    <!-- include file="$(find losi_launch)/launch/arduino_bringup.launch" / -->
 
-		<!-- Launch navsat_transform_node -->
-		<include file="$(find gps_robot_localization)/launch/static_tf.launch" />
-		
 		<!-- Launch ekf_localization_node -->
 		<include file="$(find gps_robot_localization)/launch/ekf.launch" />
 		
