@@ -1,25 +1,29 @@
 #include "remote_rc.h"
 #include "util.h"
 
+namespace rc {
+  volatile unsigned long lastRcTime = 0;
+  volatile uint16_t rcValue[PCINT_PIN_COUNT];
+  float rcChannels[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  volatile uint16_t rcData[RC_CHANS];
+  volatile uint8_t rcFailsafeCnt = 0;
+  int ctrlEn = 0;
+  float rcAcc = 0;
+  float rcThr;
+  float rcSteering;
+}
 
 static uint8_t PCInt_RX_Pins[PCINT_PIN_COUNT] = {PCINT_RX_BITS};
 volatile uint8_t GoodPulses = 0;
-volatile uint16_t rcValue[PCINT_PIN_COUNT];
-uint16_t rcData[RC_CHANS];
-volatile uint8_t rcFailsafeCnt=0;
 
-volatile unsigned long lastRcTime = 0;
-float rcChannels[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; 
-float rcAcc = 0;
-int ctrlEn = 0;
 
 void init_rc(){
   DDRK = 0;
   for(uint8_t i = 0; i < PCINT_PIN_COUNT; i++){ // i think a for loop is ok for the init.
     PCINT_RX_PORT |= PCInt_RX_Pins[i];
     PCINT_RX_MASK |= PCInt_RX_Pins[i];
-    rcValue[i] = 1500;
-    rcData[i] = 1500;
+    rc::rcValue[i] = 1500;
+    rc::rcData[i] = 1500;
   }
   PCICR = PCIR_PORT_BIT; 
 }
@@ -28,7 +32,7 @@ uint16_t readRawRC(uint8_t chan) {
   uint16_t data;
   uint8_t oldSREG;
   oldSREG = SREG; cli();  // Let's disable interrupts
-  data = rcValue[chan];   // Let's copy the data Atomically
+  data = rc::rcValue[chan];   // Let's copy the data Atomically
   SREG = oldSREG;         // Let's restore interrupt state
   return data;            // We return the value correctly copied when the IRQ's where disabled
 }
@@ -54,10 +58,10 @@ void computeRC() {
           for (a = 0; a < AVERAGING_ARRAY_LENGTH - 1; a++)
               rcDataMean += rcData4Values[chan][a];
           rcDataMean = (rcDataMean + (AVERAGING_ARRAY_LENGTH / 2)) / AVERAGING_ARRAY_LENGTH;
-          if (rcDataMean < (uint16_t)rcData[chan] - 3)
-              rcData[chan] = rcDataMean + 2;
-          if (rcDataMean > (uint16_t)rcData[chan] + 3)
-              rcData[chan] = rcDataMean - 2;
+          if (rcDataMean < (uint16_t)rc::rcData[chan] - 3)
+              rc::rcData[chan] = rcDataMean + 2;
+          if (rcDataMean > (uint16_t)rc::rcData[chan] + 3)
+              rc::rcData[chan] = rcDataMean - 2;
           rcData4Values[chan][rc4ValuesIndex] = rcDataTmp;
       }
   }
@@ -66,14 +70,14 @@ void computeRC() {
 void update_rc(){
   computeRC();
   for(uint8_t i=0; i < 6; i++){
-    rcChannels[i] = 0.5 * fmap(rcData[i], 1000, 2000, -1.0, 1.0) + 0.5*rcChannels[i];
+    rc::rcChannels[i] = 0.5 * fmap(rc::rcData[i], 1000, 2000, -1.0, 1.0) + 0.5*rc::rcChannels[i];
   }
   
-  if((rcData[2] > 1500) && (commRate < 3000)) {
-    controlMode = 1;
+  if((rc::rcData[2] > 1500) && (controller::commRate < 3000)) {
+    controller::controlMode = 1;
   }
   else{
-    controlMode = 0;
+    controller::controlMode = 0;
   }
 }
 
@@ -87,7 +91,7 @@ if (mask & PCInt_RX_Pins[pin_pos]) {                             \
       dTime = cTime - edgeTime[pin_pos]; \
     }\
     if (900<dTime && dTime<2200) {                               \
-      rcValue[rc_value_pos] = dTime;                             \
+      rc::rcValue[rc_value_pos] = dTime;                             \
       if((rc_value_pos==0 || rc_value_pos==1 ||                   \
           rc_value_pos==2 || rc_value_pos==3)                     \
           && dTime>FAILSAFE_DETECT_TRESHOLD)                     \
@@ -135,14 +139,14 @@ ISR(RX_PC_INTERRUPT) {
     RX_PIN_CHECK(7,7);
   #endif
   
-  if (GoodPulses == 0x0F) {  // If all main four chanells have good pulses, clear FailSafe counter
+  if (GoodPulses == 0x0F) {  // If all main four channels have good pulses, clear FailSafe counter
       GoodPulses = 0;
-      if(rcFailsafeCnt > 20){
-          rcFailsafeCnt -= 20;
+      if(rc::rcFailsafeCnt > 20){
+          rc::rcFailsafeCnt -= 20;
       } else {
-          rcFailsafeCnt = 0;
+          rc::rcFailsafeCnt = 0;
       }
      
   } 
-  lastRcTime = micros();
+  rc::lastRcTime = micros();
 }

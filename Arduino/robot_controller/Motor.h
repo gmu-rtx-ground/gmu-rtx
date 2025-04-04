@@ -1,15 +1,16 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
-#endif
 
 #include <Arduino.h>
 #include <stdint.h>
 
-#define noServos 3
+#ifndef noServos
+    #define noServos 3
+#endif  // noServos
 
 #ifndef sTimer
     #define sTimer 4
-#endif
+#endif  // sTimer
 
 #if noServos > 0
 
@@ -22,8 +23,8 @@
         #define s_WGM2 WGM12
         #define s_WGM3 WGM13
         #define s_CS0 CS10
-        #define s_CS1 CS11
-        #define s_SC2 CS12
+        #define s_CS1 CS11 // CS111
+        #define s_CS2 CS12
         #define s_ICR ICR1
         #define s_COMA1 COM1A1
         #define s_COMB1 COM1B1
@@ -34,17 +35,16 @@
         #ifndef S1
             #define S1 OCR1A
             #define S1_PIN DDB5
-        #elif
-        #endif
+        #endif  // S1
         #ifndef S2
             #define S2 OCR1B
             #define S2_PIN DDB6
-        #endif
+        #endif  // S2
         #ifndef S3
             #define S3 OCR1C
             #define S3_PIN DDB7
-        #endif
-    #endif
+        #endif  // S3
+    #endif  // sTimer
 
     #if sTimer == 3
         #define s_DDR DDRE
@@ -56,7 +56,7 @@
         #define s_WGM3 WGM33
         #define s_CS0 CS30
         #define s_CS1 CS31
-        #define s_SC2 CS32
+        #define s_CS2 CS32
         #define s_ICR ICR3
         #define s_COMA1 COM3A1
         #define s_COMB1 COM3B1
@@ -67,18 +67,16 @@
         #ifndef S1
             #define S1 OCR3A
             #define S1_PIN DDE3
-        #elif
-        #endif
+        #endif  // S1
         #ifndef S2
             #define S2 OCR3B
             #define S2_PIN DDE4
-        #endif
+        #endif  // S2
         #ifndef S3
             #define S3 OCR3C
             #define S3_PIN DDE5
-        #endif
-
-    #endif
+        #endif  // S3
+    #endif  // sTimer
 
     #if sTimer == 4
         #define s_DDR DDRH
@@ -90,7 +88,7 @@
         #define s_WGM3 WGM43
         #define s_CS0 CS40
         #define s_CS1 CS41
-        #define s_SC2 CS42
+        #define s_CS2 CS42
         #define s_ICR ICR4
         #define s_COMA1 COM4A1
         #define s_COMB1 COM4B1
@@ -101,19 +99,19 @@
         #ifndef S1
             #define S1 OCR4A
             #define S1_PIN DDH3
-        #endif
+        #endif  // S1
         #ifndef S2
             #define S2 OCR4B
             #define S2_PIN DDH4
-        #endif
+        #endif  // S2
         #ifndef S3
             #define S3 OCR4C
             #define S3_PIN DDH5
-        #endif
-    #endif
+        #endif  // S3
+    #endif  // sTimer
 
     #if sTimer == 5
-        #define S_DDR DDRH
+        #define s_DDR DDRH
         #define s_TCCRA TCCR5A
         #define s_TCCRB TCCR5B
         #define s_TCCRC TCCR5C
@@ -122,7 +120,7 @@
         #define s_WGM3 WGM53
         #define s_CS0 CS50
         #define s_CS1 CS51
-        #define s_SC2 CS52
+        #define s_CS2 CS52
         #define s_ICR ICR5
         #define s_COMA1 COM5A1
         #define s_COMB1 COM5B1
@@ -134,19 +132,18 @@
         #ifndef S1
             #define S1 OCR5A
             #define S1_PIN DDL3
-        #elif
-        #endif
+        #endif  // S1
         #ifndef S2
             #define S2 OCR5B
             #define S2_PIN DDL4
-        #endif
+        #endif  // S2
         #ifndef S3
             #define S3 OCR5C
             #define S3_PIN DDL5
-        #endif
-    #endif
+        #endif  // S3
+    #endif  // sTimer
 
-#endif
+#endif  // noServos
 
 #if noServos > 0
     #define writeS1(value)  \
@@ -154,7 +151,7 @@
         S1 = value * 2;     \
         sei();              
 
-#endif
+#endif  // noServos
 
 
 #if noServos > 1
@@ -162,16 +159,25 @@
         cli();              \
         S2 = value * 2;     \
         sei();              
-#endif
+#endif  // noServos
 
 #if noServos > 2
     #define writeS3(value)  \
         cli();              \
         S3 = value * 2;     \
         sei();              
-#endif
+#endif  // noServos
 
-extern uint16_t servoValues[noServos];
+namespace Motor {
+    extern uint16_t servoValues[noServos];
+    extern uint16_t servoData[3];
+    extern uint16_t minStr;
+    extern uint16_t maxStr;
+    extern uint16_t minThr;
+    extern uint16_t maxThr;
+    extern uint16_t offsetSteering;
+}
+
 void initServos();
 void writeServo(uint8_t servo, uint8_t idx);
 void write_servos();
@@ -181,14 +187,16 @@ int throttle_PID(int, int);
 #ifndef ESC
     #define ESC writeS1
     #define ESC_idx 0
-#endif
+#endif  // ESC
 
 #ifndef Steering
     #define Steering writeS2
     #define Steering_idx 1
-#endif
+#endif  // Steering
 
 #ifndef Aux
     #define Aux writeS3
     #define Aux_idx 2
-#endif
+#endif  // Aux
+
+#endif // MOTOR_H_

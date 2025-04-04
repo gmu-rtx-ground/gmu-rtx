@@ -1,21 +1,22 @@
-
-#include "Arduino.h"
+#include <Arduino.h>
+#include <avr/wdt.h>
 #include "def.h"
+#include "Motor.h"
 #include "ros_node.h"
 #include "remote_rc.h"
-#include "Motor.h"
 #include "robot_controller.h"
 #include "util.h"
-#include <avr/wdt.h>
 
-int controlMode = 0;
-uint16_t commRate = 0.0;
-uint16_t rcRate = 0.0;
+namespace controller {
+    uint8_t controlMode = 0;
+    uint16_t controlLoop = 0;
+    uint16_t commRate = 0;
+    uint16_t rcRate = 0;
+    float cmdThrottle = 0.0;
+    float cmdSteering = 0.0;
+    float cmdAux = 0.0;
+}
 // uint16_t comm = 0.0;
-uint16_t controlLoop = 0.0;
-float cmdThrottle = 0.0 ;
-float cmdSteering = 0.0;
-float cmdAux = 0.0;
 uint16_t prevTime = 0;
 uint16_t prevJoy = 0;
 
@@ -26,9 +27,9 @@ void setup() {
   for(uint8_t i = 0; i < 8; i++){
     update_rc();;
   }
-  servoValues[0] = (int) fmap(rcChannels[0], -1.0, 1.0, minStr, maxStr);
-  servoValues[1] = 1500;
-  servoValues[2] = 1000;
+  Motor::servoValues[0] = (int) fmap(rc::rcChannels[0], -1.0, 1.0, Motor::minStr, Motor::maxStr);
+  Motor::servoValues[1] = 1500;
+  Motor::servoValues[2] = 1000;
   write_servos();
   delay(1000);
   init_ros_node(); 
@@ -39,46 +40,46 @@ void setup() {
 
 uint8_t failsafe(){
   uint8_t f_stat = 0;
-  long cftime = micros();
+  uint32_t cftime = micros();
   //check the last message time from ROS
-  if ((cftime - lastMsgTime)/10 > commLossTime*50 && ((cftime > lastMsgTime) || rosMsgFlag > 0)){
+  if ((cftime - ros_node::lastMsgTime)/10 > commLossTime*50 && ((cftime > ros_node::lastMsgTime) || ros_node::rosMsgFlag > 0)){
     f_stat = 1;
-    rosThr = 0.0;
-    rosSteering = 0.0;
+    ros_node::rosThr = 0.0;
+    ros_node::rosSteering = 0.0;
   }
-  if(cftime > lastMsgTime){
-    rosMsgFlag = 1;
+  if(cftime > ros_node::lastMsgTime){
+    ros_node::rosMsgFlag = 1;
   }
 
   //check the last message time from RC
-  if((cftime - lastRcTime)/10 > rcFailSafeTime*100 && cftime > lastRcTime){
+  if((cftime - rc::lastRcTime)/10 > rcFailSafeTime*100 && cftime > rc::lastRcTime){
     f_stat = 2;
   }
   if(f_stat > 1){
     servo_failsafe();
   }
   if(f_stat == 1){
-    controlMode = 0;
+    controller::controlMode = 0;
   }
   return f_stat; 
 
 }
 
 void joy_step(){
-  joyMsg.header.stamp = nodeHandle.now();
-  joyMsg.header.frame_id = "base_link";
-  joyMsg.axes_length = 6;
-  joyMsg.buttons_length = 1; 
+  ros_node::joyMsg.header.stamp = ros_node::nodeHandle.now();
+  ros_node::joyMsg.header.frame_id = "base_link";
+  ros_node::joyMsg.axes_length = 6;
+  ros_node::joyMsg.buttons_length = 1; 
   float joyAxes[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   int32_t joyButtons[1] = {0}; 
-  if(rcRate<100){
+  if(controller::rcRate<100){
     for(int i=0; i < 6; i++){
-      joyAxes[i] = rcChannels[i];
+      joyAxes[i] = rc::rcChannels[i];
     }
   }
-  joyMsg.axes = joyAxes;
-  joyMsg.buttons = joyButtons;
-  joyPub.publish(&joyMsg);
+  ros_node::joyMsg.axes = joyAxes;
+  ros_node::joyMsg.buttons = joyButtons;
+  ros_node::joyPub.publish(&ros_node::joyMsg);
 }
 
 void loop (){
@@ -94,38 +95,38 @@ void loop (){
     servo_failsafe();
     Serial.print("Failsafe Active Error Code: ");
     Serial.println(fState);
-    nodeHandle.spinOnce();
+    ros_node::nodeHandle.spinOnce();
     delayMicroseconds(5);
     return;
   }
   if (fState == 1){
     // Serial.print("Failsafe Active Error Code: ");
     // Serial.println(fState);
-    controlMode = 0;
+    controller::controlMode = 0;
   }
 
-  if(controlMode == 0){
-    cmdThrottle = fmap(rcChannels[1], -1.0, 1.0, minThr, maxThr);
-    cmdSteering = fmap(rcChannels[0], -1.0, 1.0, minSt, maxSt);  
-    cmdAux = 1000;  
+  if(controller::controlMode == 0){
+    controller::cmdThrottle = fmap(rc::rcChannels[1], -1.0, 1.0, Motor::minThr, Motor::maxThr);
+    controller::cmdSteering = fmap(rc::rcChannels[0], -1.0, 1.0, minSt, maxSt);  
+    controller::cmdAux = 1000;  
   }
   
-  if(controlMode == 1){
-      cmdThrottle = fmap(rosThr, -1.0, 1.0, minThr, maxThr);
-      cmdSteering = fmap(rosSteering, -1.0, 1.0, minSt, maxSt);
-      cmdAux = fmap(rosAux, -1.0,  1.0, 900, 2100);
-      cmdAux = constrain(cmdAux, 900, 2100);
+  if(controller::controlMode == 1){
+      controller::cmdThrottle = fmap(ros_node::rosThr, -1.0, 1.0, Motor::minThr, Motor::maxThr);
+      controller::cmdSteering = fmap(ros_node::rosSteering, -1.0, 1.0, minSt, maxSt);
+      controller::cmdAux = fmap(ros_node::rosAux, -1.0,  1.0, 900, 2100);
+      controller::cmdAux = constrain(controller::cmdAux, 900, 2100);
   }
 
-  servoValues[0] = (uint16_t) cmdSteering;
-  servoValues[1] = (uint16_t) cmdThrottle;
-  servoValues[2] = (uint16_t) cmdAux;
+  Motor::servoValues[0] = (uint16_t) controller::cmdSteering;
+  Motor::servoValues[1] = (uint16_t) controller::cmdThrottle;
+  Motor::servoValues[2] = (uint16_t) controller::cmdAux;
   write_servos();
   if(timeNow - prevJoy >= 20){
     prevJoy = timeNow;
     joy_step();
   }
   joy_step();
-  nodeHandle.spinOnce();
+  ros_node::nodeHandle.spinOnce();
   delay(5);
 }

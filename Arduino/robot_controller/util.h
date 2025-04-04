@@ -12,4 +12,4 @@ int get_thr_cmd(int inThr, int rpmCur);
 int fw_to_rev(int, int);
 int rev_to_fw(int);
 
-#endif
+#endif  // UTIL_H_

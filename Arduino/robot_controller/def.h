@@ -11,7 +11,7 @@
 #define rcLed         25
 #define gpsLed        26
 #define camLed        27
-#define modeLed       28
+// #define modeLed       28 // Duplicated
 #define lidarLed      29
 
 //Sensor Pins
@@ -54,7 +54,7 @@
 /*******************************************************
                   Parameter definitions
 *******************************************************/
-#define encCpr        {15,15}//{15, 15}
+#define encCpr        {15, 15}
 #define battscale     17.3
 #define f_diff_ratio  0.3
 #define tire_dia      218
@@ -66,5 +66,9 @@
 #define maxDesc       32.0
 #define maxSpeed      22.0
 
+/*******************************************************
+                  Serial definitions
+*******************************************************/
+#define baudRate    115200
 
 #endif
