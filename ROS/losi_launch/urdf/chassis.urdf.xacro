@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacros">
+
+    <xacro:macro name="chassis" params="">
+
+        <link name="base_link">
+
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <geometry>
+                    <!-- <mesh filename="file:///home/aniket/Documents/MPPI_vertiFormer/mesh/v4w.obj" scale="1 1 1"/> -->
+                    <!-- <mesh filename="package://losi_launch/meshes/v4w.obj" scale="1 1 1"/> -->
+                    <box size="0.6 0.3 0.1"/>
+                </geometry>
+                <material name="grey"/>
+            </visual>
+
+            <intertial>
+                <mass value="5.0"/>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+            </intertial>
+
+            <collision>
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+                <geometry>
+                    <!-- <mesh filename="file:///home/aniket/Documents/MPPI_vertiFormer/mesh/v4w.stl" scale="1 1 1"/> -->
+                    <!-- <mesh filename="package://losi_launch/meshes/v4w.stl" scale="1 1 1"/> -->
+                    <box size="0.6 0.3 0.1"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <!-- Steering servo -->
+        <link name="steering_servo_link">
+            <visual>
+                <origin xyz="0.3 0 0.05" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.05 0.05 0.05"/>
+                </geometry>
+                <material name="blue"/>
+            </visual>
+        </link>
+
+        <joint name="steering_servo_joint" type="fixed">
+            <parent link="base_link"/>
+                <child link="steering_servo_link"/>
+            <origin xyz="0.3 0 0.05" rpy="0 0 0"/>
+        </joint>
+
+        <!-- Transmission servo -->
+        <link name="transmission_servo_link">
+            <visual>
+                <origin xyz="-0.2 0 0.05" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.05 0.05 0.05"/>
+                </geometry>
+                <material name="blue"/>
+            </visual>
+        </link>
+
+        <joint name="transmission_servo_joint" type="fixed">
+            <parent link="base_link"/>
+                <child link="transmission_servo_link"/>
+            <origin xyz="-0.2 0 0.05" rpy="0 0 0"/>
+        </joint>
+
+
+        <!-- Front steering axle -->
+        <link name="front_axle_link">
+            <visual>
+                <origin xyz="0.25 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.1 0.6 0.05"/>
+                </geometry>
+                <material name="red"/>
+            </visual>
+        </link>
+
+        <joint name="steering_joint" type="revolute">
+            <parent link="base_link"/>
+            <child link="front_axle_link"/>
+            <origin xyz="0.25 0 0" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="-0.5236" upper="0.5236" effort="5" velocity="1.0"/>
+        </joint>
+
+        <!-- Front left wheel -->
+        <link name="front_left_wheel_link">
+            <visual>
+            <origin xyz="0 0.2 0" rpy="1.5708 0 0"/>
+            <geometry>
+                <cylinder radius="0.12" length="0.04"/>
+            </geometry>
+            <material name="black"/>
+            </visual>
+        </link>
+
+        <joint name="front_left_wheel_joint" type="fixed">
+            <parent link="front_axle_link"/>
+            <child link="front_left_wheel_link"/>
+            <origin xyz="0 0.2 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- Front right wheel -->
+        <link name="front_right_wheel_link">
+            <visual>
+            <origin xyz="0 -0.2 0" rpy="1.5708 0 0"/>
+            <geometry>
+                <cylinder radius="0.12" length="0.04"/>
+            </geometry>
+            <material name="black"/>
+            </visual>
+        </link>
+
+        <joint name="front_right_wheel_joint" type="fixed">
+            <parent link="front_axle_link"/>
+            <child link="front_right_wheel_link"/>
+            <origin xyz="0 -0.2 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- Rear axle -->
+        <link name="rear_axle_link">
+            <visual>
+            <origin xyz="-0.25 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.1 0.6 0.05"/>
+            </geometry>
+            <material name="red"/>
+            </visual>
+        </link>
+
+        <joint name="rear_axle_joint" type="fixed">
+            <parent link="base_link"/>
+            <child link="rear_axle_link"/>
+            <origin xyz="-0.25 0 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- Rear left wheel -->
+        <link name="rear_left_wheel_link">
+            <visual>
+            <origin xyz="0 0.2 0" rpy="1.5708 0 0"/>
+            <geometry>
+                <cylinder radius="0.12" length="0.04"/>
+            </geometry>
+            <material name="black"/>
+            </visual>
+        </link>
+
+        <joint name="rear_left_wheel_joint" type="fixed">
+            <parent link="rear_axle_link"/>
+            <child link="rear_left_wheel_link"/>
+            <origin xyz="0 0.2 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- Rear right wheel -->
+        <link name="rear_right_wheel_link">
+            <visual>
+            <origin xyz="0 -0.2 0" rpy="1.5708 0 0"/>
+            <geometry>
+                <cylinder radius="0.12" length="0.04"/>
+            </geometry>
+            <material name="black"/>
+            </visual>
+        </link>
+
+        <joint name="rear_right_wheel_joint" type="fixed">
+            <parent link="rear_axle_link"/>
+            <child link="rear_right_wheel_link"/>
+            <origin xyz="0 -0.2 0" rpy="0 0 0"/>
+        </joint>
+
+    </xacro:macro>
+
+</robot>

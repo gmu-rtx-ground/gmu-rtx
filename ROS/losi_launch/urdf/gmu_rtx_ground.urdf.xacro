@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Top-Level URDF for Ground Robot -->
+<robot name="gmu-rtx-ground" xmlns:xacro="http://ros.org/wiki/xacros">
+
+  <!-- Load chassis -->
+  <xacro:include filename="chassis.urdf.xacro"/>
+
+  <!-- Load sensors -->
+  <xacro:include filename="sensors.urdf.xacro"/>
+
+  <!-- Load shared materials -->
+  <xacro:include filename="materials.xacro"/>
+
+  <!-- Call macros -->
+  <xacro:chassis/>
+  <xacro:sensors/>
+
+</robot>
