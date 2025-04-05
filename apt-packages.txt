@@ -40,6 +40,7 @@ ros-noetic-rosserial-arduino
 ros-noetic-rosserial-python
 ros-noetic-rospy
 ros-noetic-rospy-tutorials
+ros-noetic-rplidar-ros
 ros-noetic-rqt-bag
 ros-noetic-rqt-common-plugins
 ros-noetic-rqt-console
