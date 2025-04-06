@@ -77,6 +77,8 @@ RUN chown -R ${USER_UID}:${USER_GID} ${CATKIN_WS} & \
 # Build the ROS workspace
 WORKDIR ${CATKIN_WS}
 
+USER ${USERNAME}
+
 # Initialize and build the workspace
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
                     catkin init && \
@@ -88,8 +90,6 @@ RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> ${USR_HOME}/.bashrc
 
 # Set the working directory to the project directory
 WORKDIR ${GMU_RTX}
-
-USER ${USERNAME}
 
 # Mount common Ubuntu Linux paths as volumes
 VOLUME ["/home", "/mnt", "/opt"]
