@@ -16,14 +16,16 @@
 
 		<!-- Launch ekf_localization_node -->
 		<include file="$(find gps_robot_localization)/launch/ekf.launch" />
-		
+
+		<!-- Launch robot model -->
+		<!-- <include file="(find losi_launch)/launch/display.launch" /> -->
 
 		 <!-- Launch Move Base -->
 		<!-- <node pkg="move_base" type="move_base" name="move_base" output="screen"-->
 			<!--rosparam file="$(find losi_launch)/config/move_base.yaml" command="load" /-->
 			<!-- Remap cmd topics -->
 			<!-- <remap from="cmd_vel" to "/cmd_vel1" /> -->
-		<!-- </node> --> -->
+		<!-- </node> -->
 	    
 	    <!-- node name="dynamic_reconfigure_load_flir_right" pkg="dynamic_reconfigure" type="dynparam" args="load /sensor_suite/right_camera_optical/spinnaker_camera_nodelet/ $(find spinnaker_camera_driver)/params/right_triggered.yaml" / -->
 

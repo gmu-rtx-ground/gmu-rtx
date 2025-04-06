@@ -5,7 +5,7 @@
   <node pkg="tf" type="static_transform_publisher" name="gps_to_base"
       args="0 0 0 0 0 0 base_link rover 100" /> -->
 
-  <param name="use_sim_time" value="true" />
+  <!-- <param name="use_sim_time" value="true" /> -->
   <include file="$(find gps_robot_localization)/launch/static_tf.launch" />
   <node pkg="tf2_ros" type="buffer_server" name="tf2_buffer_server" args="100.0" />
 
@@ -19,7 +19,7 @@
     <rosparam file="$(find gps_robot_localization)/config/navsat_config.yaml" command="load" />
     <remap from="/imu/data" to="/losi/witmotion_imu/imu" />
     <remap from="/gps/fix" to="/losi/f9p_rover/fix" />
-    <!-- <remap from="/odometry/filtered" to="/odometry/fused" /> -->
+    <remap from="/odometry/filtered" to="/odometry/fused" />
     <!-- <remap from="/odometry/gps" to="/gps/odom" /> -->
     <param name="transform_time_offset" value="0.1" />
     <param name="transform_timeout" value="0.1" />
