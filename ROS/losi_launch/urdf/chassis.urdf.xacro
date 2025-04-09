@@ -68,7 +68,7 @@
 
 
         <!-- Front steering axle -->
-        <link name="front_axle_link">
+        <link name="front_axle_link">  
             <visual>
                 <origin xyz="0.25 0 0" rpy="0 0 0"/>
                 <geometry>
@@ -77,8 +77,9 @@
                 <material name="red"/>
             </visual>
         </link>
-
-        <joint name="steering_joint" type="revolute">
+        
+        <!-- change back to type=revolute and publish steering joint state for steering sim -->
+        <joint name="steering_joint" type="fixed"> 
             <parent link="base_link"/>
             <child link="front_axle_link"/>
             <origin xyz="0.25 0 0" rpy="0 0 0"/>

@@ -3,8 +3,9 @@ two_d_mode: true  # Restrict to SE(2): x, y, yaw
 transform_time_offset: 0.0
 transform_timeout: 0.0
 publish_tf: true
+publish_filtered_path: true
 map_frame: map
-odom_frame: odom
+odom_frame: map
 base_link_frame: base_link
 world_frame: map
 
@@ -21,7 +22,7 @@ imu0_remove_gravitational_acceleration: true
 imu0_relative: false
 
 # GPS (converted to odometry)
-gps0: /losi/f9p_rover/fix
+gps0: /losi/odometry/gps
 gps0_config: [true,  true,  false,   # x, y, z
                false, false, false,   # roll, pitch, yaw
                true, true, false,   # vx, vy, vz
