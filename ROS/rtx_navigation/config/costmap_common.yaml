@@ -1,0 +1,29 @@
+# TODO Change the robot footprint
+footprint: [[-0.5, -0.33], [-0.5, 0.33], [0.5, 0.33], [0.5, -0.33]]
+# footprint: [[-0.65, -0.42], [-0.65, 0.42], [0.65, 0.42], [0.65, -0.42]]
+footprint_padding: 0.05
+
+robot_base_frame: base_link
+update_frequency: 5.0
+publish_frequency: 10
+transform_tolerance: 0.5
+
+resolution: 0.05
+
+# TODO: You can Play around with this
+obstacle_range: 4
+raytrace_range: 6
+
+#layer definitions
+static:
+    map_topic: /map
+    subscribe_to_updates: true
+
+# TODO Change the name of the topic
+obstacles_laser:
+   observation_sources: laser 
+   laser: {data_type: LaserScan, clearing: true, marking: true, topic: /sensor_suite/ouster/scan, inf_is_valid: true}
+
+# INFO: how close would you want to the obstacle.
+inflation:
+    inflation_radius: 0.2
