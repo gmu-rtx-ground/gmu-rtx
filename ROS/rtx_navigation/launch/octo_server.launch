@@ -1,0 +1,32 @@
+<launch>
+    <node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+		<param name="resolution" value="0.1" />
+		
+		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
+		<param name="frame_id" type="string" value="odom" />
+		
+		<!-- maximum range to integrate (speedup!) -->
+		<param name="sensor_model/max_range" value="8.0" />
+
+		<!-- TODO: What exactly is this? -->
+		<param name="sensor_model/hit" value="0.8" />
+
+		<param name="base_frame_id" value="base_link" />
+
+
+		<!-- <param name="filter_ground" value="false" /> -->
+		<!-- # Don't use this -->
+		<!-- <param name="ground_filter/plane_distance" value="0.2" /> -->
+		<!-- <param name="ground_filter/distance" value="0.2" /> -->
+		<!-- <param name="ground_filter/angle" value="5.0" /> -->
+
+
+		<param name="pointcloud_min_z" value="0.0" />
+		<param name="pointcloud_max_z" value="1.5" />
+
+		<!-- data source to integrate (PointCloud2) -->
+		<remap from="cloud_in" to="/sensor_suite/ouster/points" />
+		<!-- <remap from="cloud_in" to="voxel_grid/output" /> -->
+	
+	</node>
+</launch>
