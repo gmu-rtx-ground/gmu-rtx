@@ -28,13 +28,14 @@
   <run_depend>dwa_local_planner</run_depend>
 
   <build_depend>rospy</build_depend>
-  <exec_depend>rospy</exec_depend>
-
-  <build_depend>std_msgs</build_depend>
-  <exec_depend>std_msgs</exec_depend>
+  <run_depend>rospy</run_depend>
 
   <build_depend>geometry_msgs</build_depend>
-  <exec_depend>geometry_msgs</exec_depend>
+  <run_depend>geometry_msgs</run_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <run_depend>std_msgs</run_depend>
+
 
   <export>
   </export>
