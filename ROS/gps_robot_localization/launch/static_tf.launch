@@ -1,4 +1,4 @@
 <launch>
   <node pkg="tf" type="static_transform_publisher" name="imu_to_base" args="0 0 0 0 0 0 base_link imu 100" />
-  <node pkg="tf" type="static_transform_publisher" name="gps_to_base" args="0 0 0 0 0 0 base_link rover 10" />
+  <node pkg="tf" type="static_transform_publisher" name="gps_to_base" args="0 0 0 0 0 0 base_link rover 100" />
 </launch>

@@ -1,12 +1,9 @@
+<?xml version="1.0"?>
 <launch>
-  <!-- Static Transforms -->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="imu_to_base"
-      args="0 0 0 0 0 0 base_link imu 100" />
-  <node pkg="tf" type="static_transform_publisher" name="gps_to_base"
-      args="0 0 0 0 0 0 base_link rover 100" /> -->
-
-  <!-- <param name="use_sim_time" value="true" /> -->
+  <!-- Include static transforms first -->
   <include file="$(find gps_robot_localization)/launch/static_tf.launch" />
+  
+  <!-- Buffer server with sufficient buffer time -->
   <node pkg="tf2_ros" type="buffer_server" name="tf2_buffer_server" args="100.0" />
 
   <!-- EKF Node -->
@@ -15,13 +12,14 @@
     <remap from="/odometry/filtered" to="/odometry/fused" />
   </node>
 
+  <!-- NavSat Transform Node -->
   <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true">
     <rosparam file="$(find gps_robot_localization)/config/navsat_config.yaml" command="load" />
     <remap from="/imu/data" to="/losi/witmotion_imu/imu" />
     <remap from="/gps/fix" to="/losi/f9p_rover/fix" />
     <remap from="/odometry/filtered" to="/odometry/fused" />
-    <!-- <remap from="/odometry/gps" to="/gps/odom" /> -->
-    <param name="transform_time_offset" value="0.1" />
-    <param name="transform_timeout" value="0.1" />
+    <remap from="/odometry/gps" to="/losi/odometry/gps" />
+    <param name="transform_time_offset" value="0.2" />
+    <param name="transform_timeout" value="0.5" />
   </node>
 </launch>
