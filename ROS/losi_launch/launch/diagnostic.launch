@@ -1,0 +1,18 @@
+<launch>
+  <!-- RQT with TF Tree visualization -->
+  <node pkg="rqt_tf_tree" type="rqt_tf_tree" name="tf_tree" />
+  
+  <!-- Diagnostic node to check TF rates -->
+  <node pkg="rostopic" type="rostopic" name="check_imu" 
+        args="hz /losi/witmotion_imu/imu" output="screen" />
+  <node pkg="rostopic" type="rostopic" name="check_gps" 
+        args="hz /losi/f9p_rover/fix" output="screen" />
+  <node pkg="rostopic" type="rostopic" name="check_odom" 
+        args="hz /odometry/fused" output="screen" />
+  <node pkg="rostopic" type="rostopic" name="check_gps_odom" 
+        args="hz /losi/odometry/gps" output="screen" />
+  
+  <!-- Debug node to publish empty transforms if needed -->
+  <node pkg="tf" type="static_transform_publisher" name="debug_odom_map" 
+        args="0 0 0 0 0 0 map odom 100" if="$(arg debug_tf)" />
+</launch>

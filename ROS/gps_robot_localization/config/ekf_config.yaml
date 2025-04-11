@@ -1,13 +1,15 @@
-frequency: 30.0  # Hz, adjust based on your system
+frequency: 30.0  # Hz
 two_d_mode: true  # Restrict to SE(2): x, y, yaw
 transform_time_offset: 0.0
-transform_timeout: 0.0
+transform_timeout: 0.5  # Increased to handle potential delays
 publish_tf: true
 publish_filtered_path: true
-map_frame: map
-odom_frame: odom
-base_link_frame: base_link
-world_frame: odom
+
+# These frame IDs define your TF hierarchy
+map_frame: map        # Global fixed frame
+odom_frame: odom      # Odometry frame (continuous but drifting)
+base_link_frame: base_link  # Robot's body frame
+world_frame: odom     # The frame in which to publish the odometry (odom for local EKF)
 
 # IMU sensor
 imu0: /losi/witmotion_imu/imu
@@ -15,29 +17,29 @@ imu0_config: [false, false, false,   # x, y, z
               false, false, true,    # roll, pitch, yaw
               false, false, false,   # vx, vy, vz
               false, false, true,    # vroll, vpitch, vyaw
-              true,  true,  false]   #ax, ay, az 
+              true,  true,  false]   # ax, ay, az 
 imu0_differential: false
 imu0_queue_size: 10
 imu0_remove_gravitational_acceleration: true
-imu0_relative: false
+imu0_relative: true   # Changed to true since IMU is relative to base_link
 
 # GPS (converted to odometry)
-gps0: /losi/odometry/gps
-gps0_config: [true,  true,  false,   # x, y, z
+odom0: /losi/odometry/gps
+odom0_config: [true,  true,  false,   # x, y, z
                false, false, false,   # roll, pitch, yaw
-               true, true, false,   # vx, vy, vz
+               true,  true,  false,   # vx, vy, vz
                false, false, false,   # vroll, vpitch, vyaw
-               false, false, false]    #ax, ay, az 
-gps0_differential: false
-gps0_queue_size: 10
-gps0_pose_rejection_threshold: 5.0
-gps0_position_rejection_threshold: 10.0
-gps0_velocity_rejection_threshold: 5.0
+               false, false, false]   # ax, ay, az 
+odom0_differential: false
+odom0_queue_size: 10
+odom0_pose_rejection_threshold: 5.0
+odom0_position_rejection_threshold: 10.0
+odom0_velocity_rejection_threshold: 5.0
 
 # Decrease position covariance to increase trust in GPS
-gps0_pose_covariance: [0.002, 0.0, 0.0, 0.0, 0.0, 0.0,    # x (was 0.005625)
-                        0.0, 0.002, 0.0, 0.0, 0.0, 0.0,    # y (was 0.005625)
-                        0.0, 0.0, 0.01, 0.0, 0.0, 0.0,     # z (was 0.011236)
+odom0_pose_covariance: [0.002, 0.0, 0.0, 0.0, 0.0, 0.0,    # x
+                        0.0, 0.002, 0.0, 0.0, 0.0, 0.0,    # y
+                        0.0, 0.0, 0.01, 0.0, 0.0, 0.0,     # z
                         0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0,  # roll
                         0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0,  # pitch
                         0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0]  # yaw
