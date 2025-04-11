@@ -36,6 +36,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL
   <node pkg="topic_tools" type="relay" name="odom_relay" 
       args="/losi/odometry/filtered /odom" />
 
+  <node name="cmd_vel_bridge" pkg="your_package" type="cmd_vel_bridge.py" output="screen" />
+
+
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="tf_prefix" value="losi" />
 
