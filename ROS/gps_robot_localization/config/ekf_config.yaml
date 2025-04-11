@@ -9,7 +9,7 @@ publish_filtered_path: true
 map_frame: map        # Global fixed frame
 odom_frame: odom      # Odometry frame (continuous but drifting)
 base_link_frame: base_link  # Robot's body frame
-world_frame: odom     # The frame in which to publish the odometry (odom for local EKF)
+world_frame: map     # The frame in which to publish the odometry (odom for local EKF)
 
 # IMU sensor
 imu0: /losi/witmotion_imu/imu
