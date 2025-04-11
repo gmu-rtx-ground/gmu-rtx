@@ -6,6 +6,7 @@ dbus
 git
 iputils-ping
 libopencv-dev
+libgeographic-dev
 nano
 net-tools
 openssh-client

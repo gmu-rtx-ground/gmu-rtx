@@ -81,10 +81,63 @@ if [ -z "${CATKIN_WS}" ]; then
 fi
 
 # Create sym links for ROS packages
-make links
+ROS_SOURCE_DIR="${HOME}/gmu-rtx/ROS"
+DESTINATION_DIR="${CATKIN_WS}/src"
+
+# Exclusion Directories
+EXCLUDE_DIRS=(
+  "Roscordings"
+  "udev_rules"
+)
+
+# Check if the source directory exists
+if [ ! -d "${ROS_SOURCE_DIR}" ]; then
+  echo "ROS source directory does not exist. Exiting."
+  exit 1
+fi
+
+# Check if the destination directory already exists
+mkdir -p "${DESTINATION_DIR}"
+
+# Function to check if a directory is in the exclusion list
+is_excluded() {
+  local dir="$1"
+  for exclude in "${EXCLUDE_DIRS[@]}"; do
+    if [[ "$dir" == *"$exclude"* ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Process each directory in the repo source
+for dir in "$ROS_SOURCE_DIR"/*; do
+  # Get the basename
+  base=$(basename "$dir")
+  
+  # Skip if in exclusion list
+  if is_excluded "$base"; then
+    echo "Skipping excluded dir: $base"
+    continue
+  fi
+  
+  # Destination path for the symlink
+  dest_link="$DESTINATION_DIR/$base"
+  
+  # Create symlink if it doesn't already exist
+  if [ ! -e "$dest_link" ]; then
+    ln -s "$dir" "$dest_link"
+    echo "Created symlink: $dest_link -> $dir"
+  else
+    echo "Symlink already exists: $dest_link"
+  fi
+done
 
 # Build catkin packages
 cd "${CATKIN_WS}"
+
+rosdep update
+rosdep install --from-paths src --ignore-src  -r -y
 caktin clean -y
 catkin build
 catkin test
