@@ -5,7 +5,7 @@ from std_msgs.msg import Float32MultiArray
 
 def cmd_vel_callback(msg):
     out = Float32MultiArray()
-    # Example conversion: linear.x → throttle, angular.z → steering
+    # Example conversion: linear.x -> throttle, angular.z ->steering
     out.data = [msg.angular.z, msg.linear.x, 0.0]
     pub.publish(out)
 
