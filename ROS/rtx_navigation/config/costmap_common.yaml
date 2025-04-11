@@ -6,7 +6,7 @@ footprint_padding: 0.05
 robot_base_frame: base_link
 update_frequency: 5.0
 publish_frequency: 10
-transform_tolerance: 0.5
+transform_tolerance: 1.0  # Increased to handle potential TF delays
 
 resolution: 0.05
 
@@ -26,4 +26,4 @@ obstacles_laser:
 
 # INFO: how close would you want to the obstacle.
 inflation:
-    inflation_radius: 0.2
+    inflation_radius: 0.5  # Increased for safer navigation

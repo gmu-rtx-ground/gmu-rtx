@@ -31,8 +31,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL
   <arg name="base_global_planner" default="navfn/NavfnROS"/>
   <arg name="base_local_planner" default="dwa_local_planner/DWAPlannerROS"/>
   <!-- <arg name="base_local_planner" default="base_local_planner/TrajectoryPlannerROS"/> -->
-  <node pkg="tf" type="static_transform_publisher" name="odom_to_base_link" 
-      args="0 0 0 0 0 0 odom base_link 100" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_base_link"  -->
+      <!-- args="0 0 0 0 0 0 odom base_link 100" /> -->
   <node pkg="topic_tools" type="relay" name="odom_relay" 
       args="/losi/odometry/filtered /odom" />
 
@@ -59,6 +59,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL
     <rosparam file="$(find husky_navigation)/config/costmap_global_laser.yaml" command="load" ns="global_costmap" if="$(arg no_static_map)"/>
     <param name="global_costmap/width" value="100.0" if="$(arg no_static_map)"/>
     <param name="global_costmap/height" value="100.0" if="$(arg no_static_map)"/>
+    
+    <!-- Increase transform tolerance for more stability -->
+    <param name="controller_patience" value="15.0"/>
+    <param name="recovery_behavior_enabled" value="true"/>
+    <param name="clearing_rotation_allowed" value="true"/>
+    <param name="planner_frequency" value="1.0"/>
+    <param name="oscillation_timeout" value="30.0"/>
+    <param name="oscillation_distance" value="0.5"/>
+    <param name="conservative_reset_dist" value="3.0"/>
   </node>
 
 </launch>
