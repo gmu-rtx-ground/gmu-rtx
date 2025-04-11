@@ -5,9 +5,9 @@ transform_timeout: 0.0
 publish_tf: true
 publish_filtered_path: true
 map_frame: map
-odom_frame: map
+odom_frame: odom
 base_link_frame: base_link
-world_frame: map
+world_frame: odom
 
 # IMU sensor
 imu0: /losi/witmotion_imu/imu

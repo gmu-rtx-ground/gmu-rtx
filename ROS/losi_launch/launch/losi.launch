@@ -5,6 +5,9 @@
 	    <include file="$(find witmotion_ros)/launch/wt901.launch"/>
 	    <!--coordinate frame for IMU is set in driver's config yaml-->
 	    
+		<node pkg="tf2_ros" type="static_transform_publisher" name="imu_base_link" 
+              args="0 0 0 0 0 0 base_link imu" />
+
 	    <!-- Ublox GPS -->
 	    <include file="$(find ublox_gps)/launch/rover.launch" />
 	    
