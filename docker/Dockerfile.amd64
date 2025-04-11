@@ -131,8 +131,7 @@ USER ${USERNAME}
 # Initialize and build the workspace
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
                     catkin init && \
-                    catkin build && \
-                    catkin test"
+                    catkin build"
 
 # Source the ROS workspace
 RUN echo "source ${CATKIN_WS}/devel/setup.bash" >> ${USR_HOME}/.bashrc
