@@ -30,5 +30,8 @@
     
     <!-- Set this to false if you don't want to wait for a GPS fix before starting -->
     <param name="wait_for_datum" value="false" />
+    <param name="frequency" value="10.0" />
+    <param name="transform_timeout" value="1.0" />
+    <param name="publish_filtered_gps" value="true" />
   </node>
 </launch>
