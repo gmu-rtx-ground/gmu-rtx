@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Static Transforms first -->
+  <node pkg="tf" type="static_transform_publisher" name="base_to_imu" 
+        args="0 0 0 0 0 0 base_link imu 100" />
+  <node pkg="tf" type="static_transform_publisher" name="base_to_gps" 
+        args="0 0 0 0 0 0 base_link rover 100" />
+
+  <!-- Buffer server with sufficient buffer time -->
+  <node pkg="tf2_ros" type="buffer_server" name="tf2_buffer_server" args="100.0" />
+
+  <!-- Wait for GPS Fix -->
+  <node pkg="gps_robot_localization" type="wait_for_fix.py" name="wait_for_fix" output="screen">
+    <param name="gps_topic" value="/losi/f9p_rover/fix" />
+    <param name="min_satellites" value="5" />
+    <param name="timeout" value="60.0" />
+  </node>
+
+  <!-- EKF Node (main odom producer) -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
+    <rosparam file="$(find gps_robot_localization)/config/ekf_config.yaml" command="load" />
+    <remap from="/odometry/filtered" to="/odometry/fused" />
+  </node>
+
+  <!-- NavSat Transform Node (GPS to odom converter) -->
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true" respawn="true">
+    <rosparam file="$(find gps_robot_localization)/config/navsat_config.yaml" command="load" />
+    
+    <!-- Topic remappings -->
+    <remap from="/imu/data" to="/losi/witmotion_imu/imu" />
+    <remap from="/gps/fix" to="/losi/f9p_rover/fix" />
+    <remap from="/odometry/filtered" to="/odometry/fused" />
+    <remap from="/odometry/gps" to="/losi/odometry/gps" />
+    
+    <!-- Added parameters for better stability -->
+    <param name="transform_time_offset" value="0.2" />
+    <param name="transform_timeout" value="0.5" />
+    <param name="wait_for_datum" value="false" />
+  </node>
+
+  <!-- Map Server - create an empty map with origin at GPS start point -->
+  <node pkg="map_server" type="map_server" name="gps_map_server" output="screen"
+        args="$(find losi_launch)/maps/empty_map.yaml">
+    <param name="frame_id" value="map" />
+  </node>
+</launch>

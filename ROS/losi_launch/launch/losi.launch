@@ -1,36 +1,53 @@
 <launch>
 	<group ns="losi">
-
 	    <!-- witmotion_ros IMU -->
 	    <include file="$(find witmotion_ros)/launch/wt901.launch"/>
-	    <!--coordinate frame for IMU is set in driver's config yaml-->
 	    
-		<node pkg="tf2_ros" type="static_transform_publisher" name="imu_base_link" 
-              args="0 0 0 0 0 0 base_link imu" />
-
 	    <!-- Ublox GPS -->
 	    <include file="$(find ublox_gps)/launch/rover.launch" />
 	    
-	    <!-- realsense Camera -->
+		<!-- GPS-based localization, map initialization, and EKF - ALL IN ONE -->
+        <include file="$(find gps_robot_localization)/launch/merged_gps_localization.launch" />
+
+		<!-- Launch the robot state publisher -->
+		<!-- <include file="$(find losi_launch)/launch/display.launch" /> -->
+        
+	    <!-- realsense Camera (commented out) -->
 	    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch" / -->
 	    
-	    <!-- arduino -->
+	    <!-- arduino (commented out) -->
 	    <!-- include file="$(find losi_launch)/launch/arduino_bringup.launch" / -->
 
-		<!-- Launch ekf_localization_node -->
-		<include file="$(find gps_robot_localization)/launch/ekf.launch" />
-
-		<!-- Launch robot model -->
+		<!-- Launch robot model (commented out) -->
 		<!-- <include file="(find losi_launch)/launch/display.launch" /> -->
 
-		 <!-- Launch Move Base -->
-		<!-- <node pkg="move_base" type="move_base" name="move_base" output="screen"-->
-			<!--rosparam file="$(find losi_launch)/config/move_base.yaml" command="load" /-->
-			<!-- Remap cmd topics -->
-			<!-- <remap from="cmd_vel" to "/cmd_vel1" /> -->
+		<!-- Launch Move Base -->
+		<include file="$(find husky_navigation)/launch/move_base.launch" />
+		<!-- <node pkg="move_base" type="move_base" name="move_base" output="screen"> -->
+			<!-- <rosparam file="$(find husky_navigation)/config/planner.yaml" command="load" /> -->
+			<!--  -->
+			<!-- <rosparam file="$(find husky_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" /> -->
+			<!-- <rosparam file="$(find husky_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" /> -->
+			<!--  -->
+			<!-- <rosparam file="$(find husky_navigation)/config/costmap_local.yaml" command="load" ns="local_costmap" /> -->
+			<!-- <rosparam file="$(find husky_navigation)/config/costmap_global_laser.yaml" command="load" ns="global_costmap" /> -->
+			<!--  -->
+			<!-- <param name="local_costmap/width" value="10.0"/> -->
+			<!-- <param name="local_costmap/height" value="10.0"/> -->
+			<!-- <param name="global_costmap/width" value="100.0"/> -->
+			<!-- <param name="global_costmap/height" value="100.0"/> -->
+			<!--  -->
+			<!-- <param name="global_costmap/global_frame" value="map"/> -->
+			<!-- <param name="local_costmap/global_frame" value="map"/> -->
+			<!--  -->
+			<!-- <param name="controller_patience" value="15.0"/> -->
+			<!-- <param name="recovery_behavior_enabled" value="true"/> -->
+			<!-- <param name="clearing_rotation_allowed" value="true"/> -->
+			<!-- <param name="planner_frequency" value="1.0"/> -->
+			<!-- <param name="oscillation_timeout" value="30.0"/> -->
+			<!-- <param name="oscillation_distance" value="0.5"/> -->
+			<!-- <param name="conservative_reset_dist" value="3.0"/> -->
+			<!--  -->
 		<!-- </node> -->
-	    
-	    <!-- node name="dynamic_reconfigure_load_flir_right" pkg="dynamic_reconfigure" type="dynparam" args="load /sensor_suite/right_camera_optical/spinnaker_camera_nodelet/ $(find spinnaker_camera_driver)/params/right_triggered.yaml" / -->
-
 	</group>
 </launch>
