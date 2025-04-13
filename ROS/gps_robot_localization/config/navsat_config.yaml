@@ -5,7 +5,7 @@ yaw_offset: 90.0  # If IMU yaw differs from true north
 zero_altitude: true
 broadcast_cartesian_transform: true
 publish_filtered_gps: true
-use_odometry_yaw: true  # Use IMU yaw to align GPS
+use_odometry_yaw: false  # Use IMU yaw to align GPS
 wait_for_datum: false
 datum: [0.0, 0.0, 0.0, world]  # Will be auto-populated with first GPS fix when wait_for_datum is false
 
