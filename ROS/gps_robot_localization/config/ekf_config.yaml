@@ -21,7 +21,7 @@ imu0_config: [false, false, false,   # x, y, z
 imu0_differential: false
 imu0_queue_size: 10
 imu0_remove_gravitational_acceleration: true
-imu0_relative: true   # Changed to true since IMU is relative to base_link
+imu0_relative: false  # Changed to true since IMU is relative to base_link
 
 # GPS (converted to odometry)
 odom0: /losi/odometry/gps
