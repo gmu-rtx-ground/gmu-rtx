@@ -1,9 +1,18 @@
-frequency: 1.0
-delay: 0.0
-magnetic_declination_radians: 0.0  # Adjust for your location
-yaw_offset: 90.0  # If IMU yaw differs from true north
-zero_altitude: true
+map_frame: utm
+odom_frame: odom
+base_link_frame: base_link
+gps_frame: rover
+
+magnetic_declination_radians: 0.174533 # Adjust for your location
+
 broadcast_cartesian_transform: true
+broadcast_cartesian_transform_as_parent_frame: true
+zero_altitude: true
+
+frequency: 5.0
+delay: 0.0
+yaw_offset: 0.0 #-1.5707963  # If IMU yaw differs from true north
+
 publish_filtered_gps: true
 use_odometry_yaw: false  # Use IMU yaw to align GPS
 wait_for_datum: false
@@ -11,4 +20,4 @@ datum: [0.0, 0.0, 0.0, world]  # Will be auto-populated with first GPS fix when 
 
 
 # Important: These parameters ensure proper frame consistency
-transform_timeout: 0.5  # Increased from default
+transform_timeout: 0.2  # Increased from default

@@ -1,25 +1,27 @@
-frequency: 30.0  # Hz
+frequency: 50.0  # Hz
 two_d_mode: true  # Restrict to SE(2): x, y, yaw
 transform_time_offset: 0.0
-transform_timeout: 0.5  # Increased to handle potential delays
+transform_timeout: 0.8  # Increased to handle potential delays
 publish_tf: true
-publish_filtered_path: true
+imu_used: true
+odom_used: true
+
 
 # These frame IDs define your TF hierarchy
-map_frame: map        # Global fixed frame
-odom_frame: map      # Odometry frame (continuous but drifting)
+map_frame: utm        # Global fixed frame
+odom_frame: odom     # Odometry frame (continuous but drifting)
 base_link_frame: base_link  # Robot's body frame
-world_frame: map     # The frame in which to publish the odometry (odom for local EKF)
+world_frame: odom     # The frame in which to publish the odometry (odom for local EKF)
 
 # IMU sensor
 imu0: /losi/witmotion_imu/imu
 imu0_config: [false, false, false,   # x, y, z
-              false, false, true,    # roll, pitch, yaw
+              true, true, true,    # roll, pitch, yaw
               false, false, false,   # vx, vy, vz
-              false, false, true,    # vroll, vpitch, vyaw
-              true,  true,  false]   # ax, ay, az 
+              true, true, true,    # vroll, vpitch, vyaw
+              true,  true,  true]   # ax, ay, az 
 imu0_differential: false
-imu0_queue_size: 10
+imu0_queue_size: 1000
 imu0_remove_gravitational_acceleration: true
 imu0_relative: false  # Changed to true since IMU is relative to base_link
 
@@ -27,37 +29,37 @@ imu0_relative: false  # Changed to true since IMU is relative to base_link
 odom0: /losi/odometry/gps
 odom0_config: [true,  true,  false,   # x, y, z
                false, false, false,   # roll, pitch, yaw
-               true,  true,  false,   # vx, vy, vz
+               false, false,  false,   # vx, vy, vz
                false, false, false,   # vroll, vpitch, vyaw
                false, false, false]   # ax, ay, az 
-odom0_differential: true  # Changed to true - this is a key change
+odom0_differential: false  # Changed to true - this is a key change
 odom0_queue_size: 15  # Increased from 10
-odom0_pose_rejection_threshold: 10.0  # Increased from 5.0
-odom0_position_rejection_threshold: 15.0  # Increased from 10.0
+odom0_pose_rejection_threshold: 5.0  # Increased from 5.0
+odom0_position_rejection_threshold: 10.0  # Increased from 10.0
 odom0_velocity_rejection_threshold: 5.0
 
 # Modified position covariance to be less trusting of GPS
-odom0_pose_covariance: [0.1, 0.0, 0.0, 0.0, 0.0, 0.0,    # x - increased from 0.002
-                       0.0, 0.1, 0.0, 0.0, 0.0, 0.0,    # y - increased from 0.002
-                       0.0, 0.0, 0.01, 0.0, 0.0, 0.0,     # z
+odom0_pose_covariance: [0.5, 0.0, 0.0, 0.0, 0.0, 0.0,    # x - increased from 0.002
+                       0.0, 0.5, 0.0, 0.0, 0.0, 0.0,    # y - increased from 0.002
+                       0.0, 0.0, 0.5, 0.0, 0.0, 0.0,     # z
                        0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0,  # roll
                        0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0,  # pitch
                        0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0]  # yaw
 
 # Added process noise covariance for better tuning
-process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0,    0.03, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0,    0,    0.03, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0,    0,    0,    0.06, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0,    0,    0,    0,    0.025, 0,     0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0,    0,    0,    0,    0,     0.025, 0,    0,    0,    0,    0,    0,    0,
-                          0,    0,    0,    0,    0,    0,    0,     0,     0.04, 0,    0,    0,    0,    0,    0,
+process_noise_covariance: [1.5, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    1.5, 0,    0,    0,    0,    0,      0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    1.5, 0,    0,    0,    0,      0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    0,    0.01, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    0,    0,    0.01, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    0,    0,    0,    0.01, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    0,    0,    0,    0,    1.1,   0,     0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    0,    0,    0,    0,    0,     1.1,   0,    0,    0,    0,    0,    0,    0,
+                          0,    0,    0,    0,    0,    0,    0,     0,     1.1,  0,    0,    0,    0,    0,    0,
                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0.01, 0,    0,    0,    0,    0,
                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.01, 0,    0,    0,    0,
-                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.02, 0,    0,    0,
-                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
-                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
-                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]
-
+                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.01, 0,    0,    0,
+                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.1, 0,    0,
+                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.1, 0,
+                          0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.1]
+#                         x     y     z     roll  p    yaw    vx     vy     vz    vroll vpitch vyaw  ax   ay   az 

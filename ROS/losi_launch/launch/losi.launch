@@ -1,4 +1,7 @@
 <launch>
+	<!-- Robot state publisher-->
+	<include file="$(find losi_launch)/launch/display.launch" />
+
 	<group ns="losi">
 	    <!-- witmotion_ros IMU -->
 	    <include file="$(find witmotion_ros)/launch/wt901.launch"/>
@@ -7,47 +10,15 @@
 	    <include file="$(find ublox_gps)/launch/rover.launch" />
 	    
 		<!-- GPS-based localization, map initialization, and EKF - ALL IN ONE -->
-        <include file="$(find gps_robot_localization)/launch/merged_gps_localization.launch" />
-
-		<!-- Launch the robot state publisher -->
-		<!-- <include file="$(find losi_launch)/launch/display.launch" /> -->
+        <!-- <include file="$(find gps_robot_localization)/launch/merged_gps_localization.launch" /> -->
         
 	    <!-- realsense Camera (commented out) -->
 	    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch" / -->
 	    
 	    <!-- arduino (commented out) -->
-	    <!-- include file="$(find losi_launch)/launch/arduino_bringup.launch" / -->
-
-		<!-- Launch robot model (commented out) -->
-		<!-- <include file="(find losi_launch)/launch/display.launch" /> -->
+	    <include file="$(find losi_launch)/launch/arduino_bringup.launch" />
 
 		<!-- Launch Move Base -->
-		<include file="$(find husky_navigation)/launch/move_base.launch" />
-		<!-- <node pkg="move_base" type="move_base" name="move_base" output="screen"> -->
-			<!-- <rosparam file="$(find husky_navigation)/config/planner.yaml" command="load" /> -->
-			<!--  -->
-			<!-- <rosparam file="$(find husky_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" /> -->
-			<!-- <rosparam file="$(find husky_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" /> -->
-			<!--  -->
-			<!-- <rosparam file="$(find husky_navigation)/config/costmap_local.yaml" command="load" ns="local_costmap" /> -->
-			<!-- <rosparam file="$(find husky_navigation)/config/costmap_global_laser.yaml" command="load" ns="global_costmap" /> -->
-			<!--  -->
-			<!-- <param name="local_costmap/width" value="10.0"/> -->
-			<!-- <param name="local_costmap/height" value="10.0"/> -->
-			<!-- <param name="global_costmap/width" value="100.0"/> -->
-			<!-- <param name="global_costmap/height" value="100.0"/> -->
-			<!--  -->
-			<!-- <param name="global_costmap/global_frame" value="map"/> -->
-			<!-- <param name="local_costmap/global_frame" value="map"/> -->
-			<!--  -->
-			<!-- <param name="controller_patience" value="15.0"/> -->
-			<!-- <param name="recovery_behavior_enabled" value="true"/> -->
-			<!-- <param name="clearing_rotation_allowed" value="true"/> -->
-			<!-- <param name="planner_frequency" value="1.0"/> -->
-			<!-- <param name="oscillation_timeout" value="30.0"/> -->
-			<!-- <param name="oscillation_distance" value="0.5"/> -->
-			<!-- <param name="conservative_reset_dist" value="3.0"/> -->
-			<!--  -->
-		<!-- </node> -->
+		<!-- <include file="$(find husky_navigation)/launch/move_base.launch" /> -->
 	</group>
 </launch>

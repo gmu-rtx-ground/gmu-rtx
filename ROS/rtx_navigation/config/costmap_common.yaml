@@ -20,9 +20,9 @@ static:
     subscribe_to_updates: true
 
 # TODO Change the name of the topic
-obstacles_laser:
-   observation_sources: laser 
-   laser: {data_type: LaserScan, clearing: true, marking: true, topic: /sensor_suite/ouster/scan, inf_is_valid: true}
+# obstacles_laser:
+#    observation_sources: laser 
+#    laser: {data_type: LaserScan, clearing: true, marking: true, topic: /sensor_suite/ouster/scan, inf_is_valid: true}
 
 # INFO: how close would you want to the obstacle.
 inflation:

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<launch>
+
+      
+  <!-- Static Transforms first -->
+  <node pkg="tf" type="static_transform_publisher" name="base_to_imu" 
+        args="0 0 0 0 0 0 base_link imu 100" />
+  <node pkg="tf" type="static_transform_publisher" name="base_to_gps" 
+        args="0 0 0 0 0 0 base_link rover 100" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_base" 
+        args="0 0 0 0 0 0 odom base_link 100" /> -->
+
+  <!-- Buffer server with sufficient buffer time -->
+
+  <node pkg="tf2_ros" type="buffer_server" name="tf2_buffer_server" args="100.0" />
+
+  <!-- Wait for GPS Fix with more lenient parameters -->
+  <node pkg="gps_robot_localization" type="wait_for_fix.py" name="wait_for_fix" output="screen">
+    <param name="gps_topic" value="/losi/f9p_rover/fix" />
+    <param name="min_satellites" value="4" />
+    <param name="timeout" value="120.0" />
+  </node>
+
+  <!-- GPS topic relay - this is the key fix! -->
+  <node pkg="topic_tools" type="relay" name="gps_relay" 
+        args="/losi/f9p_rover/fix /losi/gps/fix" />
+  
+  <!-- EKF Node (main odom producer) -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
+    <rosparam file="$(find gps_robot_localization)/config/ekf_config.yaml" command="load" />
+    <remap from="/odometry/filtered" to="/odometry/fused" />
+  </node>
+
+  <!-- NavSat Transform Node with the working configuration -->
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" 
+        clear_params="true" respawn="true">
+    <!-- Frame IDs -->
+    <param name="map_frame" value="map" />
+    <param name="odom_frame" value="odom" />
+    <param name="base_link_frame" value="base_link" />
+    <param name="gps_frame" value="rover" />
+    
+    <!-- Basic parameters -->
+    <param name="magnetic_declination_radians" value="0.0" />
+    <param name="yaw_offset" value="0.0" />
+    <param name="broadcast_cartesian_transform" value="true" />
+    <param name="broadcast_cartesian_transform_as_parent_frame" value="true" />
+    
+    <!-- Key settings that fixed the issue -->
+    <param name="wait_for_datum" value="false" />
+    <param name="use_odometry_yaw" value="true" />
+    <param name="zero_altitude" value="true" />
+    
+    <!-- Performance settings -->
+    <param name="frequency" value="10.0" />
+    <param name="delay" value="0.0" />
+    <param name="transform_timeout" value="2.0" />
+    <param name="publish_filtered_gps" value="true" />
+    
+    <!-- Topic remappings - we'll keep these, but the relay node is the key fix -->
+    <remap from="/imu/data" to="/losi/witmotion_imu/imu" />
+    <remap from="/odometry/filtered" to="/odometry/fused" />
+    <remap from="/odometry/gps" to="/losi/odometry/gps" />
+  </node>
+
+  <!-- Map Server - create an empty map with origin at GPS start point -->
+  <node pkg="map_server" type="map_server" name="gps_map_server" output="screen"
+        args="$(find losi_launch)/maps/empty_map.yaml">
+    <param name="frame_id" value="map" />
+  </node>
+</launch>
+

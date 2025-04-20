@@ -1,4 +1,4 @@
-controller_frequency: 5.0
+controller_frequency: 30.0
 recovery_behaviour_enabled: true
 
 # INFO: Your Global Planner
@@ -12,26 +12,26 @@ TrajectoryPlannerROS:
   acc_lim_x: 2.5
   acc_lim_theta:  3.2
 
-  max_vel_x: 0.3
-  min_vel_x: 0.0
+  max_vel_x: 1.0
+  min_vel_x: 0.1
 
-  max_vel_theta: 0.2
-  min_vel_theta: -0.2
-  min_in_place_vel_theta: 0.2
+  max_vel_theta: 1.0
+  min_vel_theta: -1.0
+  min_in_place_vel_theta: 0.0
 
-  holonomic_robot: true
+  holonomic_robot: false
   escape_vel: -0.1
 
   # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.1
-  xy_goal_tolerance: 0.2
+  yaw_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.8
   latch_xy_goal_tolerance: false
 
   # Forward Simulation Parameters
-  sim_time: 2.0
-  sim_granularity: 0.02
-  angular_sim_granularity: 0.02
-  vx_samples: 6
+  sim_time: 5.0
+  sim_granularity: 0.1
+  angular_sim_granularity: 0.1
+  vx_samples: 20
   vtheta_samples: 20
   controller_frequency: 20.0
 
@@ -56,32 +56,32 @@ TrajectoryPlannerROS:
 # INFO: Your default local planner
 DWAPlannerROS:
   # Robot configuration parameters  
-  acc_lim_x: 2.5
+  acc_lim_x: 4.0
   acc_lim_y: 0
-  acc_lim_th: 3.2
+  acc_lim_th: 2.0
 
-  max_vel_x: 0.8
-  min_vel_x: 0.0
+  max_vel_x: 1.0
+  min_vel_x: 1.0
   max_vel_y: 0
   min_vel_y: 0
 
-  max_vel_trans: 0.5
+  max_vel_trans: 1.0  #Anuj- changed this for no translational vel
   min_vel_trans: 0.1
   max_vel_rot: 1.0
-  min_vel_rot: 0.2
+  min_vel_rot: 0.5
 
   # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.1
-  xy_goal_tolerance: 0.2
+  yaw_goal_tolerance: 0.2
+  xy_goal_tolerance: 1.5
   latch_xy_goal_tolerance: false
 
   # Forward Simulation Parameters
-  sim_time: 5.0
-  sim_granularity: 0.02
-  vx_samples: 10
+  sim_time: 20.0
+  sim_granularity: 0.05
+  vx_samples: 30
   vy_samples: 0
   vtheta_samples: 20
-  penalize_negative_x: true
+  penalize_negative_x: false
 
   # # Trajectory scoring parameters
   # path_distance_bias: 32.0 # The weighting for how much the controller should stay close to the path it was given

@@ -1,10 +1,10 @@
-global_frame: map 
+global_frame: odom 
 rolling_window: true
 track_unknown_space: true
 
-plugins:
-  - {name: obstacles_laser,           type: "costmap_2d::ObstacleLayer"}
-  - {name: inflation,                 type: "costmap_2d::InflationLayer"}
+# plugins:
+#   - {name: obstacles_laser,           type: "costmap_2d::ObstacleLayer"}
+#   - {name: inflation,                 type: "costmap_2d::InflationLayer"}
 
 # global_costmap:
 #   global_frame: map

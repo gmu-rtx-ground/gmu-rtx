@@ -1,0 +1,31 @@
+<launch>
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true" respawn="true">
+        <!-- Frame IDs -->
+        <param name="map_frame" value="map" />
+        <param name="odom_frame" value="odom" />
+        <param name="base_link_frame" value="base_link" />
+        <param name="gps_frame" value="rover" />
+        
+        <!-- Basic parameters -->
+        <param name="magnetic_declination_radians" value="0.0" />
+        <param name="yaw_offset" value="0.0" />
+        <param name="broadcast_cartesian_transform" value="true" />
+        <param name="broadcast_cartesian_transform_as_parent_frame" value="true" />
+        
+        <!-- Key settings that fixed the issue -->
+        <param name="wait_for_datum" value="false" />
+        <param name="use_odometry_yaw" value="true" />
+        <param name="zero_altitude" value="true" />
+        
+        <!-- Performance settings -->
+        <param name="frequency" value="10.0" />
+        <param name="delay" value="0.0" />
+        <param name="transform_timeout" value="2.0" />
+        <param name="publish_filtered_gps" value="true" />
+        
+        <!-- Topic remappings - we'll keep these, but the relay node is the key fix -->
+        <remap from="/imu/data" to="/losi/witmotion_imu/imu" />
+        <remap from="/odometry/filtered" to="/odometry/fused" />
+        <remap from="/odometry/gps" to="/losi/odometry/gps" />
+    </node>
+</launch>

@@ -7,7 +7,7 @@ witmotion_imu:
     restart_service_name: restart_imu
     imu_publisher:
         topic_name: imu
-        frame_id: imu
+        frame_id: imu_link
         use_native_orientation: true
         measurements:
             acceleration:
@@ -28,7 +28,7 @@ witmotion_imu:
     temperature_publisher:
         enabled: true
         topic_name: temperature
-        frame_id: base_link
+        frame_id: imu_link
         from_message: magnetometer # acceleration, angular_vel, orientation, magnetometer
         variance: 0.01829
         coefficient: 1.0 # Linear calibration parameters: coefficient
@@ -45,7 +45,7 @@ witmotion_imu:
     barometer_publisher:
         enabled: false
         topic_name: /barometer
-        frame_id: imu
+        frame_id: imu_link
         variance: 0.001
         coefficient: 1.0 # Linear calibration parameters: coefficient
         addition: 0.0 # and addendum
@@ -57,14 +57,6 @@ witmotion_imu:
     orientation_publisher:
         enabled: true
         topic_name: orientation
-    gps_publisher:
-        enabled: false
-        navsat_fix_frame_id: world
-        navsat_fix_topic_name: /gps
-        navsat_altitude_topic_name: /gps_altitude
-        navsat_satellites_topic_name: /gps_satellites
-        navsat_variance_topic_name: /gps_variance
-        ground_speed_topic_name: /gps_ground_speed
     rtc_publisher:
         enabled: false
         topic_name: /witmotion_clock

@@ -1,0 +1,9 @@
+<launch>
+	<group ns="losi">
+	    <!-- witmotion_ros IMU -->
+	    <include file="$(find witmotion_ros)/launch/wt901.launch"/>
+	    
+		<!-- GPS-based localization, map initialization, and EKF - ALL IN ONE -->
+        <!-- <include file="$(find gps_robot_localization)/launch/merged_gps_localization.launch" /> -->
+	</group>
+</launch>
