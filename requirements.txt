@@ -11,3 +11,4 @@ paho-mqtt
 pymavlink
 utm
 witmotion
+digi-xbee

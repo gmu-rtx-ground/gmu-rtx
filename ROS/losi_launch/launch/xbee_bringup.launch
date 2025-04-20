@@ -1,0 +1,11 @@
+<launch>
+    <!-- Set the port name for the XBee device -->
+    <param name="xbee_port" value="/dev/xBee" />
+
+    <!-- Launch the XBee GPS receiver node -->
+    <node name="xbee_gps_receiver" pkg="losi_launch" type="discovery_code_reciver.py" output="screen">
+        <param name="port_read" value="/dev/xBee"/>
+        <param name="baud_read" value="115200"/>
+        <param name="baud_write" value="115200"/>
+    </node>
+</launch>

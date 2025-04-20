@@ -8,6 +8,9 @@
 	    
 	    <!-- Ublox GPS -->
 	    <include file="$(find ublox_gps)/launch/rover.launch" />
+
+		<!-- XBee GPS receiver -->
+		<include file="$(find losi_launch)/launch/xbee_bringup.launch" />
 	    
 		<!-- GPS-based localization, map initialization, and EKF - ALL IN ONE -->
         <!-- <include file="$(find gps_robot_localization)/launch/merged_gps_localization.launch" /> -->
