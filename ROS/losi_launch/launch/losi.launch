@@ -20,7 +20,9 @@
 	    
 	    <!-- arduino (commented out) -->
 	    <include file="$(find losi_launch)/launch/arduino_bringup.launch" />
-
+		
+		<!-- lidar -->
+		<include file="$(find ldlidar_stl_ros)/launch/ld19.launch" />
 		<!-- Launch Move Base -->
 		<!-- <include file="$(find husky_navigation)/launch/move_base.launch" /> -->
 	</group>
