@@ -1,4 +1,4 @@
-frequency: 50.0  # Hz
+frequency: 30.0  # Hz
 two_d_mode: true  # Restrict to SE(2): x, y, yaw
 transform_time_offset: 0.0
 transform_timeout: 0.8  # Increased to handle potential delays
