@@ -13,7 +13,7 @@ publish:
   # rxm:
   #   rawx: true
 rate: 10 
-nav_rate: 1
+nav_rate: 10
 
 device: /dev/ubloxGPS
 usb:
