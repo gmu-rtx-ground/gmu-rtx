@@ -19,7 +19,7 @@
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/ubuntu/.gitconfig,type=bind"
   ],
   // "postCreateCommand": "/bin/bash .devcontainer/detect-usb.sh",
-  "postStartCommand": ["/bin/bash .devcontainer/entrypoint.sh", "/bin/bash .devcontainer/detect-usb.sh"],
+  // "postStartCommand": ["/bin/bash .devcontainer/entrypoint.sh", "/bin/bash .devcontainer/detect-usb.sh"],
   "customizations": {
     "vscode": {
       "extensions": [
